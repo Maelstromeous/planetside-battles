@@ -1,0 +1,675 @@
+body
+{
+	padding-top: 10px;
+}
+
+.navbar
+{
+	display: none;
+}
+
+#streamBody
+{
+	position: absolute;
+	top: 10px;
+	left: 10px;
+}
+
+#streamContainer
+{
+	width: 1850px;
+	height: 1041px;
+	margin: auto;
+	position: relative;
+	background-color: black;
+	/*background-image: url('../../img/streaming/back.jpg');
+	background-size: cover;*/
+}
+
+#bugContainer
+{
+	position: absolute;
+	top: 20px;
+	left: 23px;
+	width: 454px;
+	height: 144px;
+	background-color: white;
+	border: 2px solid #999894;
+}
+
+#boxBar {
+	position: relative;
+}
+
+#bugAwaitingCapture, #bugMatchCountdown {
+	position: absolute;
+	top: 0px;
+	z-index: 100;
+	height: 85px;
+	background-color: rgb(64, 64, 64);
+	width: 450px;
+	text-align: center;
+	padding-top: 20px;
+	font-family: 'Open Sans' sans-serif
+}
+
+#bugMatchCountdown {
+	height: 140px;
+	padding-top: 15px;
+}
+
+#bugMatchCountdown h3 {
+	color: white;
+}
+
+#psbLogos
+{
+	position: absolute;
+	top: 20px;
+	right: 20px;
+}
+
+#populations
+{
+	position: absolute;
+	background-color: white;
+	padding: 5px;
+	width: 114px;
+	right: -118px;
+	top: -2px;
+	text-align: center;
+	border: 2px solid grey;
+	padding-top: 1px;
+	opacity: 0;
+}
+
+.playerCounts
+{
+	font-size: 25px !important;
+}
+
+#killTotals
+{
+	position: absolute;
+	top: 411px;
+	left: 288px;
+	z-index: 1;
+	font-family: 'Open Sans' sans-serif;
+	opacity: 0;
+}
+
+#killTotals table th
+{
+	text-align: center;
+	padding: 2px;
+	padding-bottom: 0px;
+	color: white;
+	border: 0;
+	font-size: 20px;
+}
+
+#killTotals table td
+{
+	padding: 2px;
+	padding-top: 1px;
+	border: 0;
+	width: 60px;
+	text-align: center;
+	vertical-align: middle;
+}
+
+#killTotals table td span
+{
+	font-size: 16px !important;
+}
+
+.totals
+{
+	background-color: #867100;
+}
+
+.label
+{
+	display: block !important;
+	border-radius: 0px !important;
+	font-weight: 400 !important;
+	font-size: 13px;
+	border-radius: 0px !important;
+	font-weight: 300;
+	padding: 0px;
+	padding-top: 3px;
+	padding-bottom: 3px;
+}
+
+#killGraph
+{
+	position: absolute;
+	bottom: 0px;
+	left: 466px;
+	width: 715px;
+	height: 500px;
+	z-index: 1;
+	color: white;
+	opacity: 0;
+}
+
+#playerStats
+{
+	position: absolute;
+	left: 1184px;
+	bottom: 25px;
+	width: 690px;
+	height: 454px;
+	z-index: 1;
+	color: white;
+	opacity: 0;
+}
+
+#factionChart
+{
+	width: 715px;
+	height: 500px;
+}
+
+#facilityChart
+{
+	height: 500px;
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+#mapTimeline
+{
+	position: absolute;
+	bottom: 0px;
+	width: 1380px;
+	height: 497px;
+	left: 469px;
+	z-index: 0;
+	opacity: 0;
+}
+
+#map
+{
+	position: absolute;
+	bottom: 21px;
+	left: 26px;
+	width: 440px;
+	height: 476px;
+	background-color: rgb(56, 56, 56);
+	display: none;
+}
+
+#territoryBar
+{
+	width: 100%;
+	height: 25px;
+	margin-top: -2px;
+	position: relative;
+	background: rgb(180, 0, 0);
+}
+
+#barOverlay
+{
+	background-color: #2D1A1C;
+	width: 99%;
+	height: 21px;
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	text-align: center;
+	font-family: 'Open Sans' sans-serif;
+	color: white;
+	font-size: 18px;
+	line-height: 19px;
+	opacity: 0;
+}
+
+#boxBar, #buttonBar, #territoryBar
+{
+	display: inline-block;
+}
+
+#boxBar
+{
+	overflow: hidden;
+}
+
+.boxes
+{
+	float: left;
+	width: 150px;
+	height: 81px;
+	color: white;
+	position: relative;
+	opacity: 0;
+}
+
+.score
+{
+	position: absolute;
+	right: 8px;
+	bottom: -5px;
+	font-size: 50px;
+	color: white;
+	font-family: 'Open Sans', sans-serif;
+	z-index: 3;
+	font-weight: bold;
+}
+
+#vsLogo { width: 100%; right: 0px; top: -10px; background: url('../../img/streaming/VSBlack.png'); background-size: cover; }
+#trLogo { width: 100%; right: 0px; top: -34px; background: url('../../img/streaming/TRBlack.png'); background-size: cover; }
+#ncLogo { width: 100%; right: -7px; top: -16px; background: url('../../img/streaming/NCBlack.png'); background-size: cover; }
+
+.empireLabel
+{
+	position: absolute;
+	font-family: 'Open Sans' sans-serif;
+	top: -8px;
+	left: 2px;
+	font-size: 38px;
+	z-index: 3;
+}
+
+.empirelogo
+{
+	position: absolute;
+	bottom: 2px;
+	right: 3px;
+	width: 58%;
+	opacity: 0.25;
+	z-index: 1;
+}
+
+#buttonBar
+{
+	margin-top: -2px;
+	margin-left: -3px;
+	position: relative;
+	width: 100%;
+}
+
+.button
+{
+	background-color: #616161;
+	width: 63px;
+	height: 28px;
+	float: left;
+	margin-left: 5px;
+	color: white;
+	text-align: center;
+	font-size: 21px;
+	font-weight: 400;
+	font-family: 'Open Sans' sans-serif;
+	line-height: 27px;
+}
+
+.button a
+{
+	color: white !important;
+	font-weight: 400;
+}
+
+.button:hover
+{
+	background-color: #828481;
+	cursor: pointer;
+}
+
+.buttonActive
+{
+	background-color: #B6B6B6;
+}
+
+#timer
+{
+	color: rgb(40,40,40);
+	font-size: 32px;
+	right: 10px;
+	font-family: 'Open Sans', sans-serif;
+	position: absolute;
+	top: -9px;
+	font-weight: bold;
+}
+
+.vs
+{
+	background-color: #7F31AD;
+}
+
+.nc
+{
+	background-color: #2A59D5;
+}
+
+.tr
+{
+	background-color: #B40000;
+}
+
+.tBar
+{
+	float: left;
+	height: 100%;
+	text-align: center;
+	color: rgba(255, 255, 255, 0);
+	font-size: 20px;
+}
+
+#terrVS { width: 33%; }
+#terrNC { width: 33%; }
+#terrTR { width: 34%; }
+
+#titleBar
+{
+	width: 100%;
+	height: 25px;
+	background-color: white;
+	color: black;
+	text-align: center;
+	text-transform: uppercase;
+	font-family: 'Open Sans' sans-serif;
+	font-weight: bold;
+	font-size: 18px;
+	border-top: 2px solid #999894;
+	display: none;
+}
+
+#timerLine
+{
+	position: absolute;
+	right: 148px;
+	font-size: 26px;
+	top: -7px;
+	font-weight: 300 !important;
+	font-family: 'Open Sans' Sans-serif;
+}
+
+.fader
+{
+	height: 25px;
+	display: none;
+}
+
+.fader img
+{
+	height: 27x;
+	margin-top: -3px;
+}
+
+#streamAdmin
+{
+	background-color: #EFEFEF;
+	width: 100%;
+	margin-top: 10px;
+	padding-bottom: 10px;
+}
+
+.adminCol
+{
+	border-right: 1px solid black;
+	text-align: center;
+}
+
+/* GRAPHS */
+
+
+#leaderboards, #graphs
+{
+	padding: 5px;
+	padding-bottom: 0px;
+	padding-top: 0px;
+	position: relative;
+}
+
+#leaderboards
+{
+	width: 665px;
+	height: 475px;
+}
+
+.leaderboards /* Actual leaderboard sizes */
+{
+	width: 685px;
+	height: 433px;
+	overflow: scroll;
+	overflow-x: hidden;
+	overflow-y: hidden;
+}
+
+#playerSearch
+{
+	width: 215px;
+	height: 45px;
+	position: absolute;
+	top: 2px;
+	right: 45px;
+	z-index: -1337;
+}
+
+#searchButton
+{
+	width: 45px;
+	height: 45px;
+	position: absolute;
+	top: 2px;
+	right: 0px;
+	border-radius: 5px 5px 0px 0px;
+	background-color: rgba(81, 81, 81, 0.8) !important;
+	border-left: 1px solid white;
+	border-top: 1px solid white;
+	border-right: 1px solid white;
+	border-bottom: 0;
+	color: white;
+	cursor: pointer;
+	/* z-index: 1000; */
+	line-height: 35px;
+	font-size: 22px;
+}
+
+#searchButton:hover
+{
+	background-color: rgba(255, 0, 0, 0.6);
+}
+
+#txtSearch
+{
+	z-index: -1000000;
+	height: 45px;
+	width: 0px;
+	border: 0;
+	opacity: 0;
+	float: left !important;
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+}
+
+.reel
+{
+	display: none;
+}
+
+#reel1
+{
+	display: inherit;
+}
+
+#introImage
+{
+	width: 1500px;
+	height: 970px;
+	margin: auto;
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	display: none;
+}
+
+#serverLogos
+{
+	width: 850px;
+	margin-left: auto;
+	margin-right: auto;
+	position: relative;
+	overflow: hidden;
+	margin-top: -20px;
+}
+
+#introPSB
+{
+	width: 92%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#introPSB img
+{
+	width: 100%;
+}
+
+#techdiff
+{
+	width: 100%;
+	z-index: 100000;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	display: none;
+}
+
+#techdiff img
+{
+	width: 100%;
+}
+
+.introLeft { float: left; }
+/*.introLeft img { transform: skew(8deg, 8deg); }*/
+.introRight { float: right; }
+/*.introRight img { transform: skew(-8deg, -8deg); }*/
+
+.detailText
+{
+	font-family: 'Open Sans', sans-serif;
+	font-size: 48px;
+	color: white;
+	font-weight: bold;
+	text-align: center;
+	text-transform: uppercase;
+}
+
+.detailTextLrg
+{
+	font-family: 'Oswald', sans-serif;
+	font-size: 62px;
+	color: white;
+	text-align: center;
+	font-weight: bold;
+	text-transform: uppercase;
+}
+
+.serverName
+{
+	display: inline-block;
+}
+
+.introVS
+{
+	position: absolute;
+	bottom: 13px;
+	left: 47%;
+}
+
+.smashInfo
+{
+	margin-top: 0px;
+}
+
+.nav
+{
+	z-index: 1;
+	border-width: 0px;
+}
+
+.nav li
+{
+	font-size: 18px;
+	font-family: 'Open Sans' Sans-serif;
+}
+
+.nav-tabs li.active a
+{
+	background-color: rgba(48, 48, 48, 0.8);
+	color: white !important;
+	z-index: 2;
+}
+
+.nav-tabs li.active a:hover
+{
+	background-color: rgba(81, 81, 81, 0.8) !important;
+	color: white !important;
+}
+
+.nav-tabs li.active a:focus
+{
+	background-color: rgba(48, 48, 48, 0.8) !important;
+	color: white !important;
+}
+
+.nav-tabs li
+{
+	margin-bottom: 0px;
+}
+
+.nav-tabs li a
+{
+	color: white !important;
+	margin-right: 3px;
+	padding-left: 14px;
+	padding-right: 15px;
+	background-color: rgba(123, 123, 123, 0.8);
+}
+
+.nav-tabs li a:hover
+{
+	color: white !important;
+	background-color: rgba(81, 81, 81, 0.8);
+	border-bottom-color: transparent;
+}
+
+/* Slick Grid Mods */
+
+.slick-cell
+{
+	color: white;
+	font-family: 'Open Sans' sans-serif;
+	font-size: 20px;
+}
+
+.slick-header-columns, .slick-headerrow-columns
+{
+	background-color: rgba(48, 48, 48, 0.8) !important;
+}
+
+.slick-column-name
+{
+	color: white !important;
+}
+
+.slick-row.even
+{
+	background-color: rgba(81, 81, 81, 0.8) !important;
+}
+
+.slick-row.odd
+{
+	background-color: rgba(61, 61, 61, 0.9) !important;
+}
+
+.slick-sort-indicator
+{
+	position: absolute;
+	left: -4px;
+	top: 6px;
+}

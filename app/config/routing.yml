@@ -1,0 +1,7 @@
+psb_admin:
+    resource: "@PSBAdminBundle/Resources/config/routing.yml"
+    prefix:   /admin
+
+psb_site:
+    resource: "@PSBSiteBundle/Resources/config/routing.yml"
+    prefix:   /

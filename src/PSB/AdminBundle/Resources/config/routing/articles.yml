@@ -1,0 +1,30 @@
+articles:
+    path:     /
+    defaults: { _controller: "PSBAdminBundle:Articles:index" }
+
+articles_show:
+    path:     /{id}/show
+    defaults: { _controller: "PSBAdminBundle:Articles:show" }
+
+articles_new:
+    path:     /new
+    defaults: { _controller: "PSBAdminBundle:Articles:new" }
+
+articles_create:
+    path:     /create
+    defaults: { _controller: "PSBAdminBundle:Articles:create" }
+    requirements: { _method: post }
+
+articles_edit:
+    path:     /{id}/edit
+    defaults: { _controller: "PSBAdminBundle:Articles:edit" }
+
+articles_update:
+    path:     /{id}/update
+    defaults: { _controller: "PSBAdminBundle:Articles:update" }
+    requirements: { _method: post|put }
+
+articles_delete:
+    path:     /{id}/delete
+    defaults: { _controller: "PSBAdminBundle:Articles:delete" }
+    requirements: { _method: post|delete }

@@ -1,0 +1,13 @@
+{% extends('PSBSiteBundle::public.html.twig') %}
+{% block body %}
+<div class="container content">
+	<div class="content_inner">
+		<div class="folded"><h2>{{ page.title }}</h2></div>
+		{{ page.content | raw }}
+	</div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+
+{% endblock %}

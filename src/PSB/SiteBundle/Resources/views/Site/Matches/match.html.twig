@@ -1,0 +1,515 @@
+{% extends('PSBSiteBundle::public.html.twig') %}
+
+{% block stylesheets %}
+
+<link href='http://fonts.googleapis.com/css?family=Open+Sans:300,400,700' rel='stylesheet' type='text/css'>
+<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css" rel="stylesheet" type="text/css" />
+<link href="{{ asset ('assets/css/slick.grid.css') }}" rel="stylesheet" type="text/css"/>
+<link href="{{ asset ('assets/css/matches.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset ('assets/css/leaflet.css') }}" rel="stylesheet" type="text/css" />
+<link href="{{ asset ('assets/css/leaflet-markers.css') }}" rel="stylesheet" type="text/css" />
+
+{% endblock %}
+
+{% block body %}
+<div class="container content">
+	<div class="content_inner">
+		<div class="folded">
+			<h2>
+				{% if (match.title|length > 0) %}
+					{{ match.title }}
+				{% else %}
+					Match #{{match.id}}
+				{% endif %}
+			</h2>
+		</div>
+
+		{% if match.type == 1 %}
+		<div id="introImage" class="row">
+			<div class="col-xs-11 col-xs-offset-1">
+				{% set server1Faction = match.matchsettings.server1Faction %}
+				{% set server2Faction = match.matchsettings.server2Faction %}
+				{% set server3Faction = match.matchsettings.server3Faction %}
+
+				{% set server1Name = match.serversmashdata.server1|serverName %}
+				{% set server2Name = match.serversmashdata.server2|serverName %}
+				{% set server3Name = match.serversmashdata.server3|serverName %}
+
+				{% if not server1Faction is empty and not server2Faction is empty %}
+					{% if not server3Faction is empty %}
+						{% set class = "col-xs-3" %}
+						{% set vsclass = "col-xs-3" %}
+					<div id="serverLogos3">
+					{% else %}
+						{% set class = "col-xs-5" %}
+						{% set vsclass = "col-xs-1" %}
+					<div id="serverLogos">
+					{% endif %}
+						{% if not server1Faction is empty %}
+						<div class="{{ class }} introLeft {{ server1Name }}">
+							<img src="/assets/img/serverlogos/{{ server1Name }}400px.png">
+							<div class="col-sm-4 col-sm-offset-4 factionButtons">
+								<p class="btn btn-block {{ server1Faction}}"><b>{{ server1Faction|upper }}</b></p>
+							</div>
+						</div>
+						{% endif %}
+
+						{% if not server2Faction is empty %}
+							<div class="{{ vsclass }}"></div>
+						{% endif %}
+
+						{% if not server2Faction is empty %}
+						<div class="{{ class }} introRight {{ server2Name }}">
+							<img src="/assets/img/serverlogos/{{ server2Name }}400px.png">
+							<div class="col-sm-4 col-sm-offset-4 factionButtons">
+								<p class="btn btn-block {{ server2Faction}}"><b>{{ server2Faction|upper }}</b></p>
+							</div>
+						</div>
+						{% endif %}
+
+						{% if not server3Faction is empty %}
+							<div class="introVS {{ vsclass }} detailText"></div>
+						{% endif %}
+
+						{% if not server3Faction is empty %}
+						<div class="{{ class }} introCenter {{ server3Name }}">
+							<img src="/assets/img/streaming/{{ server3Name }}Badge.png">
+						</div>
+						{% endif %}
+					</div>
+				{% endif %}
+			</div>
+		</div>
+		<hr>
+		{% endif %}
+
+		{% if (match.status != 2) %}
+		<div class="jumbotron">
+			{% if (match.status == 0) %}
+			<h1 id="countdownTitle" class="text-center">Starts in:</h1>
+			{% else %}
+			<h1 id="countdownTitle" class="text-center">Remaining:</h1>
+			{% endif %}
+			<h2 id="timer" class="text-center" style="color: rgb(205, 205, 205)">00:00:00</h2>
+
+			{% if (match.status == 0) %}
+			<div class="row">
+				<div class="col-xs-12 text-center">
+					<span class="wtb-ew-v1" style="width: 410px; display:inline-block"><script src="http://www.worldtimebuddy.com/event_widget.js?h=100&md={{ match.startTime|date('n/j/Y') }}&mt={{match.startTime|date('H')}}.00&ml=2.00&sts=0&sln=0&wt=ew-lt"></script><i><a target="_blank" href="http://www.worldtimebuddy.com/">Time converter</a> at worldtimebuddy.com</i><noscript><a href="http://www.worldtimebuddy.com/">Time converter</a> at worldtimebuddy.com</noscript><script>window[wtb_event_widgets.pop()].init()</script></span>
+				</div>
+			</div>
+			{% endif %}
+		</div>
+		{% endif %}
+		<div class="row">
+			<div class="col-md-3 col-sm-6 text-center home_col">
+				<h2>Date:</h2>
+				<p><b>{{match.startTime|date("jS M Y H:i")}} UTC</b></p>
+			</div>
+			<div class="col-md-3 col-sm-6 text-center home_col">
+				<h2>Event Type:</h2>
+				<p><b>{{match.type|matchType}}</b></p>
+			</div>
+			<div class="col-md-3 col-sm-6 text-center home_col">
+				<h2>Continent:</h2>
+				<p><b>{{match.continent|zoneName}}</b></p>
+			</div>
+			<div class="col-md-3 col-sm-6 text-center">
+				<h2>Winner:</h2>
+				{% if not (match.status == 2) %}
+				<p><b>To be determined...</b></p>
+				{% else %}
+				<p><b>{{match.serversmashdata.winner|serverName(match.startTime)}}</b></p>
+				{% endif %}
+			</div>
+		</div>
+		<hr>
+		{% if not (match.description) is empty %}
+		<div class="row">
+			<div class="col-md-12">
+				<h2>Description:</h2>
+				<p>{{ match.description | raw }}</p>
+			</div>
+		</div>
+		<hr>
+		{% endif %}
+		<div class="row">
+			<div class="col-sm-6 home_col">
+				<h2 class="text-center">Articles:</h2>
+				{% if (match.articles|length > 0) %}
+					{% for article in match.articles %}
+						<a href="/articles/{{article.path}}">"{{ article.title }}" by {{ article.author.name}}</a><br>
+					{% endfor %}
+				{% else %}
+					<p class="text-center">No articles found for this match.</p>
+				{% endif %}
+			</div>
+			<div class="col-sm-6">
+				<h2 class="text-center">VODs:</h2>
+				{% if (match.vods|length > 0) %}
+					{% for VOD in match.vods %}
+						<a href="{{VOD.link}}">"{{ VOD.title }}" ({{ VOD.service }})</a><br>
+					{% endfor %}
+				{% else %}
+					<p class="text-center">No VODs found for this match.</p>
+				{% endif %}
+			</div>
+		</div>
+	</div> <!-- end of top content div -->
+	{% if not (match.vods is empty) %}
+	<div class="content_section">
+		<div class="row">
+			<h2 class="text-center">Videos</h2>
+	{% endif %}
+		{% for VOD in match.vods %}
+			{% if (VOD.highlight == TRUE) %}
+			<div class="col-md-12">
+				<div class="embed-responsive embed-responsive-16by9">
+				{% if VOD.service == "YouTube" %}
+					<iframe class="embed-responsive-item" src="{{VOD.link}}"></iframe>
+				{% elseif VOD.service == "Twitch" %}
+					<object bgcolor="#282828" data="http://www.twitch.tv/swflibs/TwitchPlayer.swf" height="378" id="clip_embed_player_flash" type="application/x-shockwave-flash" width="620"><param name="movie" value="http://www.twitch.tv/swflibs/TwitchPlayer.swf" /><param name="allowScriptAccess" value="always" /><param name="allowNetworking" value="all" /><param name="allowFullScreen" value="true" /><param name="flashvars" value="channel=planetsidebattles&amp;auto_play=false&amp;start_volume=25&amp;videoId={{VOD.link}}&amp;device_id=bhNy19w" /></object>
+				{% endif %}
+				</div>
+			</div>
+			{% endif %}
+		{% endfor %}
+	{% if not (match.vods is empty) %}
+		</div>
+	</div>
+	{% endif %}
+
+	{% if not (match.eventdata is empty) and (match.eventdata.map == 0) %}
+	<div class="content_section">
+		<h2 class="text-center">Statistics</h2>
+		<img src="{{ asset('assets/img/matchnotbegun.png')}}" style="width: 100%">
+	</div>
+	{% endif %}
+
+	{% if (match.statsavailable == 0) %}
+	<div class="content_inner">
+		<div class="row">
+			<div class="col-md-12">
+				<h2 class="text-center">Statistics are not available for this match.</h2>
+			</div>
+		</div>
+	</div>
+	{% elseif match.status != 0 %}
+	<div class="content_section" id="stats">
+		<h2 class="text-center">Statistics</h2>
+		<p class="text-center">Statistics are currently in BETA and are subject to change.</p>
+		<div class="row">
+			<div class="col-md-12">
+				<div id="territoryBar">
+				{% set key = match.statsmap|last %}
+				{% if key is empty %}
+					{% set key = {'controlVS': 33, 'controlNC': 33, 'controlTR': 33, 'getControlvs': 33, 'getControlnc': 33, 'getControltr': 33} %}
+				{% endif %}
+
+				{% set vsPer = key.controlVS %}
+				{% set ncPer = key.controlNC %}
+				{% set trPer = key.controlTR %}
+
+				{% set server1Faction = match.matchsettings.server1Faction %}
+				{% set server2Faction = match.matchsettings.server2Faction %}
+				{% set server3Faction = match.matchsettings.server3Faction %}
+
+				{% set neutFaction = match.matchsettings.neutFaction %}
+
+				{% if not server1Faction is empty %}
+					{% set server1Per = attribute(key, 'getControl'~server1Faction|lower) %}
+				{% endif %}
+				{% if not server2Faction is empty %}
+					{% set server2Per = attribute(key, 'getControl'~server2Faction|lower) %}
+				{% endif %}
+				{% if not server3Faction is empty %}
+					{% set server3Per = attribute(key, 'getControl'~server3Faction|lower) %}
+				{% endif %}
+
+				{% if not neutFaction is empty %}
+					{% set neutPer = attribute(key, 'getControl'~neutFaction) %}
+				{% endif %}
+
+				{% set diff = (100 - vsPer - ncPer - trPer) %}
+
+				{% if not server1Faction is empty %}
+					<div class="tBar territory_section {{server1Faction}}" id="terr{{server1Faction}}" style="width: {{server1Per + diff / 3}}%" data-value="{{server1Per}}">
+					{% if (server1Per > 3) %} {{server1Per}}% {% endif %}</div>
+				{% endif %}
+
+				{% if not neutFaction is empty %}
+					<div class="tBar territory_section {{neutFaction}}" id="terr{{neutFaction}}" style="width: {{neutPer + diff / 3}}%" data-value="{{neutPer}}">
+					{% if (neutPer > 3) %}{{neutPer}}%{% endif %}</div>
+				{% elseif not server2Faction is empty %}
+					<div class="tBar territory_section {{server2Faction}}" id="terr{{server2Faction}}" style="width: {{server2Per + diff / 3}}%" data-value="{{server2Per}}">
+					{% if (server2Per > 3) %} {{server2Per}}% {% endif %}</div>
+				{% endif %}
+
+				{% if not neutFaction is empty %}
+					<div class="tBar territory_section {{server2Faction}}" id="terr{{server2Faction}}" style="width: {{server2Per + diff / 3}}%" data-value="{{server2Per}}">
+					{% if (server2Per > 3) %}{{server2Per}}%{% endif %}</div>
+				{% elseif not server3Faction is empty %}
+					<div class="tBar territory_section {{server3Faction}}" id="terr{{server3Faction}}" style="width: {{server3Per + diff / 3}}%" data-value="{{server3Per}}">
+					{% if (server3Per > 3) %} {{server3Per}}% {% endif %}</div>
+				{% endif %}
+
+					<div id="barOverlay">
+						<span id="capturedFacility" style="color: #F8D100;">Facility</span> <span id="capturedFacilityVerb">captured</span> by <span id="capturedFacilityFaction">TR</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<hr>
+		<div class="row">
+			<div class="col-xs-6 col-sm-3 col-md-3">
+				<div class="statsTotals">
+					<div class="combatLead">
+						<p class="totalheader">Kills</p>
+						<span id="totalKills" class="label label-top killCounts">{{ match.statsfactions.totalKills }}</span>
+					</div>
+					<div class="totalsLine">
+						{% if not (neutFaction == "vs") %}
+						<div class="inline-block"><span id="vsKills" class="label vs killCounts">{{ match.statsfactions.killsVS }}</span></div>
+						{% endif %}
+						{% if not (neutFaction == "nc") %}
+						<div class="inline-block"><span id="ncKills" class="label nc killCounts">{{ match.statsfactions.killsNC }}</span></div>
+						{% endif %}
+						{% if not (neutFaction == "tr") %}
+						<div class="inline-block"><span id="trKills" class="label tr killCounts">{{ match.statsfactions.killsTR }}</span></div>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+			<div class="col-xs-6 col-sm-3 col-md-3">
+				<div class="statsTotals">
+					<div class="combatLead">
+						<p class="totalheader">Deaths</p>
+						<span id="totalDeaths" class="label label-top killCounts">{{ match.statsfactions.totalDeaths }}</span>
+					</div>
+					<div class="totalsLine">
+						{% if not (neutFaction == "vs") %}
+						<div class="inline-block"><span id="vsDeaths" class="label vs killCounts">{{ match.statsfactions.deathsVS }}</span></div>
+						{% endif %}
+						{% if not (neutFaction == "nc") %}
+						<div class="inline-block"><span id="ncDeaths" class="label nc killCounts">{{ match.statsfactions.deathsNC }}</span></div>
+						{% endif %}
+						{% if not (neutFaction == "tr") %}
+						<div class="inline-block"><span id="trDeaths" class="label tr killCounts">{{ match.statsfactions.deathsTR }}</span></div>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+			<div class="col-xs-6 col-sm-3 col-md-3">
+				<div class="statsTotals">
+					<div class="combatLead">
+						<p class="totalheader">TKs</p>
+						<span id="totalTKs" class="label label-top killCounts">{{ match.statsfactions.totalTKs}}</span>
+					</div>
+					<div class="totalsLine">
+						{% if not (neutFaction == "vs") %}
+						<div class="inline-block"><span id="vsTKs" class="label vs killCounts">{{ match.statsfactions.teamKillsVS }}</span></div>
+						{% endif %}
+						{% if not (neutFaction == "nc") %}
+						<div class="inline-block"><span id="ncTKs" class="label nc killCounts">{{ match.statsfactions.teamKillsNC }}</span></div>
+						{% endif %}
+						{% if not (neutFaction == "tr") %}
+						<div class="inline-block"><span id="trTKs" class="label tr killCounts">{{ match.statsfactions.teamKillsTR }}</span></div>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+			<div class="col-xs-6 col-sm-3 col-md-3">
+				<div class="statsTotals">
+					<div class="combatLead">
+						<p class="totalheader">Suicides</p>
+						<span id="totalSuicides" class="label label-top killCounts">{{ match.statsfactions.totalSuicides }}</span>
+					</div>
+					<div class="totalsLine">
+						{% if not (neutFaction == "vs") %}
+						<div class="inline-block"><span id="vsSuicides" class="label vs killCounts">{{ match.statsfactions.suicidesVS }}</span></div>
+						{% endif %}
+						{% if not (neutFaction == "nc") %}
+						<div class="inline-block"><span id="ncSuicides" class="label nc killCounts">{{ match.statsfactions.suicidesNC }}</span></div>
+						{% endif %}
+						{% if not (neutFaction == "tr") %}
+						<div class="inline-block"><span id="trSuicides" class="label tr killCounts">{{ match.statsfactions.suicidesTR }}</span></div>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		</div>
+		<hr>
+		<div class="row">
+			<div class="col-md-7 home_col noshadow">
+				<h2 class="text-center">Leaderboards</h2>
+				<div id="playerStats">
+					<div id="leaderboards">
+						<!-- Nav tabs -->
+						<ul class="nav nav-tabs" role="tablist">
+							<li class="active"><a href="#players" role="tab" data-toggle="tab">Players</a></li>
+							<li><a href="#outfits" role="tab" data-toggle="tab">Outfits</a></li>
+							<li><a href="#weapons" role="tab" data-toggle="tab">Weapons</a></li>
+							<li><a href="#vehicles" role="tab" data-toggle="tab">Vehicles</a></li>
+						</ul>
+
+						<!-- Tab panes -->
+						<div class="tab-content">
+							<div class="input-group" id="playerSearch">
+								<input type="text" id="txtSearch" class="form-control" placeholder="Search for a Player" data-search="players" style="color: black" />
+							</div>
+							<span class="input-group-addon glyphicon glyphicon-search" id="searchButton"></span>
+							<div class="tab-pane active" id="players">
+								<div id="playerGrid" class="leaderboards"></div>
+							</div>
+							<div class="tab-pane" id="outfits">
+								<div id="outfitGrid" class="leaderboards"></div>
+							</div>
+							<div class="tab-pane" id="weapons">
+								<div id="weaponGrid" class="leaderboards"></div>
+							</div>
+							<div class="tab-pane" id="vehicles">
+								<div id="vehicleGrid" class="leaderboards"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-5">
+				<div id="killGraph">
+					<h2 class="text-center">Kill History Totals
+					<div id="factionGraph" style="padding: 0px;">
+						<div id="factionChart"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		{% if match.id >= 32 %}
+		<hr>
+		<div class="row">
+			<div class="col-md-12">
+				<h2 class="text-center">Map</h2>
+				<h4 class="text-center">This map is currently being developed. Features are missing.</h4>
+				<div class="embed-responsive embed-responsive-4by3">
+					<div id="map" class="embed-responsive-item"></div>
+				</div>
+			</div>
+		</div>
+		{% endif %}
+		<hr>
+		<div class="row">
+			<div class="col-md-12">
+				<div id="mapTimeline">
+					<h2 class="text-center">Map Timeline</h2>
+					<div id="facilityChart"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% endif %}
+</div>
+{% endblock %}
+
+{% block javascript %}
+
+{% include 'PSBAdminBundle::Common/sswebsocket.html.twig' %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
+<script src="{{ asset('assets/js/jquery.countdown.min.js') }}"></script>
+
+<script src="https://cdn.firebase.com/js/client/2.1.1/firebase.js"></script>
+
+<script>
+
+// Bug button actions
+
+var boxes = $(".boxes").length;
+var boxesSpace = $("#bugContainer").width();
+var boxWidth = boxesSpace / boxes;
+$(".boxes").css({"width": boxWidth+"px", "opacity": 1});
+
+var eventZone = {{match.continent}};
+var eventWorld = {{match.server}};
+
+{% set key = match.statsmap|last %}
+{% if key is empty %}
+	{% set key = {'controlVS': 33, 'controlNC': 33, 'controlTR': 33} %}
+{% endif %}
+{% set vsPer = key.controlVS %}
+{% set ncPer = key.controlNC %}
+{% set trPer = key.controlTR %}
+
+var vsScore = {{vsPer}};
+var ncScore = {{ncPer}};
+var trScore = {{trPer}};
+
+$("#vsScore").html(vsScore);
+$("#ncScore").html(ncScore);
+$("#trScore").html(trScore);
+
+{% if (match.status == 0) %}
+var date = {{match.startTime}} * 1000;
+
+$("#timer").countdown(date, function(event)
+{
+	$(this).text(
+		event.strftime('%-D days %H:%M:%S')
+	);
+});
+
+{% elseif (match.status == 1) %}
+var date = {{match.endTime }} * 1000;
+
+$("#timer").countdown(date, function(event)
+{
+	$(this).text(
+		event.strftime('%H:%M:%S')
+	);
+});
+{% endif %}
+
+/*var firebaseRef = new Firebase("https://poonanners.firebaseio.com/psb/");
+firebaseRef.child("totals").on("value", function(snapshot)
+{
+	var values = snapshot.val();
+	$("#playerCountVS").html(values.vs);
+	$("#playerCountNC").html(values.nc);
+	$("#playerCountTR").html(values.tr);
+	$("#playerCountTotal").html('<b>'+values.total+'</b>');
+});*/
+
+$(".nav-tabs").click(function(event) {
+	$(".leaderboards").css({"opacity": 0});
+
+	setTimeout(function()
+	{
+		pGrid.resizeCanvas();
+		oGrid.resizeCanvas();
+		wGrid.resizeCanvas();
+		vGrid.resizeCanvas();
+		$(".leaderboards").animate({"opacity": 1}, 100);
+	}, 100)
+});
+
+</script>
+
+<script>
+
+var resultID = {{match.id}};
+var inProgress = {{match.status}};
+
+</script>
+
+{% if match.id >= 32 %}
+<script src="{{ asset('assets/js/leaflet-src.js') }}"></script>
+<script src="{{ asset('assets/js/map_data_indar.js') }}"></script>
+<script src="{{ asset('assets/js/map_data_hossin.js') }}"></script>
+<script src="{{ asset('assets/js/map_data_amerish.js') }}"></script>
+<script src="{{ asset('assets/js/map_data_esamir.js') }}"></script>
+
+<script src="http://dev.braham.eu/ps2live/map/map_state_indar.js"></script>
+<script src="http://dev.braham.eu/ps2live/map/map_engine.js"></script>
+{% endif %}
+
+{% include 'PSBSiteBundle::Site/Matches/matches-jquery.html.twig' with {'match': match} %}
+
+{% endblock %}

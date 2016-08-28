@@ -1,0 +1,15 @@
+{% extends('PSBAdminBundle::admintemplate.html.twig') %}
+
+{% block body -%}
+    <h1>Matches creation</h1>
+
+    {{ form(form) }}
+
+        <ul class="record_actions">
+    <li>
+        <a href="{{ path('matches') }}">
+            Back to the list
+        </a>
+    </li>
+</ul>
+{% endblock %}

@@ -1,0 +1,269 @@
+{% extends('PSBAdminBundle::admintemplate.html.twig') %}
+
+{% block body %}
+<h1>Websocket Status</h1>
+
+<div class="row">
+	<div class="col-md-4 col-md-offset-4">
+		<div class="btn btn-block btn-danger websocketStatus">Websocket Offline!</div>
+	</div>
+	<br>
+	<br>
+	<div class="row">
+		<div class="col-md-4 col-md-offset-4">
+			<div class="col-md-2 text-center">
+				CPU<br><span id="websocketCPU" class="label label-default">0%</span>
+			</div>
+			<div class="col-md-2 text-center">
+				MEM<br><span id="websocketMEM" class="label label-default">0MB</span>
+			</div>
+			<div class="col-md-2 text-center">
+				CONS<br><span id="websocketCONS" class="label label-default">0</span>
+			</div>
+			<div class="col-md-3 text-center">
+				MSGs/Sec<br><span id="websocketMSGSec" class="label label-default">0</span>
+			</div>
+			<div class="col-md-3 text-center">
+				MSGs/Min<br><span id="websocketMSGMin" class="label label-default">0</span>
+			</div>
+			<div class="col-md-12 text-center" style="margin-top: 5px;">
+				Last updated: <span id="websocketUpdated">00:00:00 UTC</span>
+		</div>
+	</div>
+</div>
+
+<hr>
+
+<h3>Scheduled Events</h3>
+<div class="table-responsive">
+	<table class="table table-striped">
+		<tr>
+			<th>Match #</th>
+			<th>Starts</th>
+			<th>Ends</th>
+			<th>Type</th>
+			<th>Approved <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="top" title="If approval is not given, the event will not be put into the system."></span></th>
+			<th>Processed <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="top" title="Whether the system has processed the event and inserted all required data. This match should show up in the match listing."></span></th>
+			<th>Map Snapshot <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="top" title="Map Snapshots occur approx 2 minutes before match start."></span></th>
+			<th>Stats Status <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" data-placement="top" title="Starts start recording approx 15 seconds before match start to prevent crap data. Stops within 5 seconds of match end."></span></th>
+			<th>World</th>
+			<th>Zone</th>
+			<th>Admin</th>
+		</tr>
+
+	{% set missingEvent = 0 %}
+	{% for event in events %}
+		{% if not event.match is empty %}
+			{% if event.finished == "1" %}
+			<tr class="success">
+			{% elseif event.match.status == "1" %}
+			<tr class="active">
+			{% else %}
+			<tr>
+			{% endif %}
+				<td data-id="{{ event.match.id }}" data-type="id">{{ event.match.id }}</td>
+				<td data-id="{{ event.match.id }}" data-type="start">{{ event.startTime|date('d-M-y @ H:i:s') }}</td>
+				<td data-id="{{ event.match.id }}" data-type="end">{{ event.endTime|date('d-M-y @ H:i:s') }}</td>
+				<td data-id="{{ event.match.id }}" data-type="type">{{ event.type|matchType }}</td>
+				<td class="text-center" data-id="{{ event.match.id }}" data-type="approved">
+					{% if (event.approved == 1) %}
+						<span class="label label-success">Yes</span>
+					{% else %}
+						<span class="label label-danger">No</span>
+					{% endif %}
+				</td>
+				<td class="text-center" data-id="{{ event.match.id }}" data-type="processed">
+					{% if (event.processed == 1) %}
+						<span class="label label-success">Yes</span>
+					{% else %}
+						<span class="label label-danger">No</span>
+					{% endif %}
+				</td>
+				<td class="text-center" data-id="{{ event.match.id }}" data-type="map">
+					{% if (event.map == 1) %}
+						<span class="label label-success">Yes</span>
+					{% else %}
+						<span class="label label-danger">No</span>
+					{% endif %}
+				</td>
+				<td class="text-center" data-id="{{ event.match.id }}" data-type="stats">
+					{% if event.startTime > "now"|date("U") %}
+						<span class="label label-default">Waiting</span>
+					{% elseif not event.match.instance == null %}
+						<span class="label label-success">Recording!</span>
+					{% elseif event.finished == "1" %}
+						<span class="label label-success">Finished!</span>
+					{% else %}
+						<span class="label label-danger">No</span>
+					{% endif %}
+				</td>
+				<td data-id="{{ event.match.id }}" data-type="">{{ event.world|serverName }}</td>
+				<td data-id="{{ event.match.id }}" data-type="">{{ event.zone|zoneName }}</td>
+				<td>
+					<a href="/admin/streaming/{{ event.match.id }}" class="btn btn-default btn-xs">Streaming</a>
+					<a href="#" class="btn btn-default btn-xs refreshPages" data-id="{{ event.match.id }}">Refresh Pages</a>
+				</td>
+			</tr>
+		{% else %}
+			{% set missingEvent = 1 %}
+			<tr class="warning">
+				<td data-id="{{ event.id }}" data-type="id">?</td>
+				<td data-id="{{ event.id }}" data-type="start">{{ event.startTime|date('d-M-y @ H:i:s') }}</td>
+				<td data-id="{{ event.id }}" data-type="end">{{ event.endTime|date('d-M-y @ H:i:s') }}</td>
+				<td data-id="{{ event.id }}" data-type="type">{{ event.type|matchType }}</td>
+				<td class="text-center" data-id="{{ event.id }}" data-type="approved">
+					{% if (event.approved == 1) %}
+						<span class="label label-success">Yes</span>
+					{% else %}
+						<span class="label label-danger">No</span>
+					{% endif %}
+				</td>
+				<td class="text-center" data-id="{{ event.id }}" data-type="processed">
+					<span class="label label-danger">No</span>
+				</td>
+				<td class="text-center" data-id="{{ event.id }}" data-type="map">
+					<span class="label label-danger">No</span>
+				</td>
+				<td class="text-center" data-id="{{ event.id }}" data-type="stats">
+					<span class="label label-danger">No</span>
+				</td>
+				<td data-id="{{ event.id }}" data-type="">{{ event.world|serverName }}</td>
+				<td data-id="{{ event.id }}" data-type="">{{ event.zone|zoneName }}</td>
+				<td>
+					<a href="/admin/streaming/{{ event.id }}" class="btn btn-default btn-xs" disabled="disabled">Streaming</a>
+					<a href="#" class="btn btn-default btn-xs refreshPages" data-id="{{ event.id }}" disabled="disabled">Refresh Pages</a>
+				</td>
+			</tr>
+		{% endif %}
+	{% endfor %}
+	</table>
+
+	{% if missingEvent == 1 %}
+		<div class="alert alert-warning text-center" role="alert">
+			There is an unprocessed event. Please wait <b>30 seconds</b> or so and refresh in order to see the event.
+		</div>
+	{% endif %}
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+<script>
+	$(function () {
+	    $('[data-toggle="tooltip"]').tooltip();
+	})
+
+	$(".refreshPages").click(function(event) {
+		var resultID = $(this).attr("data-id");
+
+		var message = '{"payload": {"type": "reloadPages", "resultID": "'+resultID+'"}}';
+
+		websocket.send(message);
+
+		console.log("Page refresh sent");
+		console.log(message);
+	});
+
+	function onOpenPage()
+	{
+		console.log("Sending performance subscription");
+		websocket.send('{"payload": {"type": "subscribePerf"}}'); // Subscribe to events from this alert only
+	}
+
+	function onMessagePage(message)
+	{
+		if (message.messageType != "keepalive")
+		{
+			//console.log(message);
+		}
+
+		if (message.messageType == "perf")
+		{
+			var time = new Date();
+
+			var cpu = message.data.cpu;
+			var mem = message.data.mem;
+
+			var hour = time.getUTCHours();
+			var min = time.getUTCMinutes();
+			var secs = time.getUTCSeconds();
+
+			if (hour < 10) { hour = "0"+hour; }
+			if (min < 10) { min = "0"+min; }
+			if (secs < 10) { secs = "0"+secs; }
+
+			if (cpu < 99)
+			{
+				$("#websocketCPU").removeClass('label-warning label-danger').addClass('label-default');
+			}
+			else if (cpu >= 100)
+			{
+				$("#websocketCPU").removeClass('label-default label-danger').addClass('label-warning');
+			}
+			else if (cpu >= 200)
+			{
+				$("#websocketCPU").removeClass('label-default label-warning').addClass('label-danger');
+			}
+
+			if (mem < 100)
+			{
+				$("#websocketMEM").removeClass('label-warning label-danger').addClass('label-default');
+			}
+			else if (mem >= 100)
+			{
+				$("#websocketMEM").removeClass('label-default label-danger').addClass('label-warning');
+			}
+			else if (mem >= 200)
+			{
+				$("#websocketMEM").removeClass('label-default label-warning').addClass('label-danger');
+			}
+
+			$("#websocketCPU").html(cpu+"%");
+			$("#websocketMEM").html(mem+"MB");
+			$("#websocketCONS").html(message.data.conns);
+			$("#websocketMSGSec").html(message.data.msgSec);
+			$("#websocketMSGMin").html(message.data.msgLast);
+
+			$("#websocketUpdated").html(hour+":"+min+":"+secs+" UTC");
+		}
+		else if (message.messageType == "eventStatus")
+		{
+			if (message.data.type == "map")
+			{
+				console.log("Recieved Map message");
+
+				var id = message.data.id;
+
+				$("[data-type='map'][data-id='"+id+"']").find("span").html("Yes").removeClass("label-danger").addClass("label-success");
+			}
+
+			if (message.data.type == "processed")
+			{
+				console.log("Recieved Processed message");
+
+				var id = message.data.id;
+
+				$("[data-type='processed'][data-id='"+id+"']").find("span").html("Yes").removeClass("label-danger").addClass("label-success");
+			}
+
+			if (message.data.type == "matchStart")
+			{
+				console.log("Recieved End message");
+
+				var id = message.data.id;
+
+				$("[data-type='stats'][data-id='"+id+"']").find("span").html("Recording!").removeClass("label-danger label-default").addClass("label-success");
+			}
+
+			if (message.data.type == "matchEnd")
+			{
+				console.log("Recieved End message");
+
+				var id = message.data.id;
+
+				$("[data-type='stats'][data-id='"+id+"']").find("span").html("Ended!").removeClass("label-danger label-success").addClass("label-primary");
+			}
+		}
+	}
+</script>
+{% endblock %}

@@ -1,0 +1,30 @@
+matches:
+    path:     /
+    defaults: { _controller: "PSBAdminBundle:Matches:index" }
+
+matches_show:
+    path:     /{id}/show
+    defaults: { _controller: "PSBAdminBundle:Matches:show" }
+
+matches_new:
+    path:     /new
+    defaults: { _controller: "PSBAdminBundle:Matches:new" }
+
+matches_create:
+    path:     /create
+    defaults: { _controller: "PSBAdminBundle:Matches:create" }
+    requirements: { _method: post }
+
+matches_edit:
+    path:     /{id}/edit
+    defaults: { _controller: "PSBAdminBundle:Matches:edit" }
+
+matches_update:
+    path:     /{id}/update
+    defaults: { _controller: "PSBAdminBundle:Matches:update" }
+    requirements: { _method: post|put }
+
+matches_delete:
+    path:     /{id}/delete
+    defaults: { _controller: "PSBAdminBundle:Matches:delete" }
+    requirements: { _method: post|delete }

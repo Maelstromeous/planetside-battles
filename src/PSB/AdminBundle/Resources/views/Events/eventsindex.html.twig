@@ -1,0 +1,23 @@
+{% extends('PSBAdminBundle::admintemplate.html.twig') %}
+
+{% block stylesheets %}
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/css/bootstrap-datetimepicker.css') }}" />
+{% endblock %}
+
+{% block body %}
+
+<h1>Create an Event</h1>
+<div class="row">
+	<p class="text-center">Any field marked with an * is a required field</p>
+	<div class="col-md-8 col-md-offset-2">
+		{{ form_errors(form) }}
+		{{ form(form) }}
+	</div>
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+	{% include('PSBAdminBundle::Common/tinymce.html.twig') %}
+	{% include('PSBAdminBundle::Common/datetimepicker.html.twig') %}
+{% endblock %}

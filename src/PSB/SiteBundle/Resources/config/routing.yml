@@ -1,0 +1,51 @@
+psb_site_homepage:
+    path:     /
+    defaults: { _controller: PSBSiteBundle:Default:index }
+
+psb_youtube:
+    path: /media/youtube
+    defaults: { _controller: PSBSiteBundle:Default:youTube }
+
+psb_youtube_WR:
+    path: /media/worldrecord
+    defaults: { _controller: PSBSiteBundle:Default:mediaWR }
+
+psb_tournament_2015:
+    path: /ServerSmash/tournament2015
+    defaults: { _controller: PSBSiteBundle:Tournament:tournament2015 }
+
+psb_tournament_2015_kek:
+    path: /ServerSmash/tournament2015kek
+    defaults: { _controller: PSBSiteBundle:Tournament:tournamentkek }
+
+psb_site_page:
+    path: /pages/{path}
+    defaults: { _controller: PSBSiteBundle:Default:page }
+
+psb_site_articleindex:
+    path: /articles
+    defaults: { _controller: PSBSiteBundle:Default:articleList }
+
+psb_site_article:
+    path: /articles/{path}
+    defaults: { _controller: PSBSiteBundle:Default:article }
+
+psb_site_match_list:
+    path: /matches/
+    defaults: { _controller: PSBSiteBundle:Match:matchList }
+
+psb_site_match_list_filter:
+    path: /matches/{filter}
+    defaults: { _controller: PSBSiteBundle:Match:matchListFilter }
+
+psb_site_match_stats:
+    path: /match/{matchID}
+    defaults: { _controller: PSBSiteBundle:Match:matchShow }
+
+psb_donate:
+    path: /donate
+    defaults: { _controller: PSBSiteBundle:Default:donate }
+
+psb_section:
+    path: /{section}/{path}
+    defaults: { _controller: PSBSiteBundle:Default:page }

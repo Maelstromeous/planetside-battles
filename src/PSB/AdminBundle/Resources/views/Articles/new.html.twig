@@ -1,0 +1,15 @@
+{% extends('PSBAdminBundle::admintemplate.html.twig') %}
+
+{% block body -%}
+    <h1>Create Article</h1>
+
+    {{ form(form) }}
+
+    <a href="{{ path('articles') }}">
+        Back to the list
+    </a>
+{% endblock %}
+
+{% block javascript %}
+	{% include('PSBAdminBundle::Common/tinymce.html.twig') %}
+{% endblock %}

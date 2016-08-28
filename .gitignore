@@ -1,0 +1,11 @@
+*.cache
+*.log
+app/cache
+!Designs/
+*.php~
+*.psd
+psbadmin
+psbsite
+web/assets/bootstrap/node_modules/
+*.tmp
+ftpsync.settings

@@ -1,0 +1,38 @@
+{% extends('PSBAdminBundle::admintemplate.html.twig') %}
+
+{% block body -%}
+    <h1>Articles</h1>
+
+    <table class="record_properties table table-condensed">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ entity.id }}</td>
+            </tr>
+            <tr>
+                <th>Title</th>
+                <td>{{ entity.title }}</td>
+            </tr>
+            <tr>
+                <th>Content</th>
+                <td>{{ entity.content }}</td>
+            </tr>
+            <tr>
+                <th>Datetime</th>
+                <td>{{ entity.datetime|date('Y-m-d H:i:s') }}</td>
+            </tr>
+            <tr>
+                <th>Path</th>
+                <td>{{ entity.path }}</td>
+            </tr>
+        </tbody>
+    </table>
+        <a href="{{ path('articles') }}">
+            Back to the list
+        </a>
+        <a href="{{ path('articles_edit', { 'id': entity.id }) }}">
+            Edit
+        </a>
+    {{ form(delete_form) }}
+</ul>
+{% endblock %}

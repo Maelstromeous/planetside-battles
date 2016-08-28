@@ -1,0 +1,735 @@
+{% extends('PSBAdminBundle::admintemplate.html.twig') %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/themes/smoothness/jquery-ui.css" />
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css" />
+	<link rel="stylesheet" type="text/css" href="{{ asset ('assets/css/streaming/streaming.css') }}" />
+	<link href='http://fonts.googleapis.com/css?family=Oswald:400,700|Open+Sans' rel='stylesheet' type='text/css'>
+	<link href="{{ asset ('assets/css/slick.grid.css') }}" rel="stylesheet" type="text/css"/>
+{% endblock %}
+
+{% block body %}
+	<div id="streamBody">
+		<div id="streamContainer">
+			<div id="bugContainer">
+				<div id="boxBar">
+				{% set key = match.statsmap|last %}
+
+				{% set empty = 0 %}
+
+				{% if key is empty %}
+					{% set key = {'controlVS': 33, 'controlNC': 33, 'controlTR': 33} %}
+					{% set empty = 1 %}
+				{% endif %}
+
+				{% set vsPer = key.controlVS %}
+				{% set ncPer = key.controlNC %}
+				{% set trPer = key.controlTR %}
+
+				{% set server1Faction = match.matchsettings.server1Faction %}
+				{% set server2Faction = match.matchsettings.server2Faction %}
+				{% set server3Faction = match.matchsettings.server3Faction %}
+
+				{% set server1Name = match.serversmashdata.server1|serverName %}
+				{% set server2Name = match.serversmashdata.server2|serverName %}
+				{% set server3Name = match.serversmashdata.server3|serverName %}
+
+				{% set neutFaction = match.matchsettings.neutFaction %}
+
+				{% if not empty == 1 %}
+					{% if not server1Faction is empty %}
+						{% set server1Per = attribute(key, 'getControl'~server1Faction|lower) %}
+					{% endif %}
+					{% if not server2Faction is empty %}
+						{% set server2Per = attribute(key, 'getControl'~server2Faction|lower) %}
+					{% endif %}
+					{% if not server3Faction is empty %}
+						{% set server3Per = attribute(key, 'getControl'~server3Faction|lower) %}
+					{% endif %}
+
+					{% if not neutFaction is empty %}
+						{% set neutPer = attribute(key, 'getControl'~neutFaction) %}
+					{% endif %}
+				{% else %}
+					<div id="bugAwaitingCapture">
+						<h2><i class="fa fa-refresh fa-spin"></i> Awaiting first capture <i class="fa fa-refresh fa-spin"></i></h2>
+					</div>
+					{% set server1Per = 33 %}
+					{% set server2Per = 33 %}
+					{% set server3Per = 33 %}
+					{% set neutPer = 33 %}
+				{% endif %}
+
+				{% set diff = (100 - vsPer - ncPer - trPer) %}
+
+				{% if not server1Faction is empty %}
+					<div class="boxes {{ server1Faction }}">
+						<span class="empireLabel">
+						{% if match.serversmashdata.factiononly == 0 %}
+							{{server1Name}}
+						{% else %}
+							{{server1Faction|upper}}
+						{% endif %}
+						</span>
+						<span id="{{server1Faction}}Score" class="score">0</span>
+						<div class="empirelogo" id="{{server1Faction}}Logo"></div>
+					</div>
+				{% endif %}
+				{% if not server2Faction is empty %}
+					<div class="boxes {{ server2Faction }}">
+						<span class="empireLabel">
+						{% if match.serversmashdata.factiononly == 0 %}
+							{{server2Name}}
+						{% else %}
+							{{server2Faction|upper}}
+						{% endif %}
+						</span>
+						<span id="{{server2Faction}}Score" class="score">100</span>
+						<div class="empirelogo" id="{{server2Faction}}Logo"></div>
+					</div>
+				{% endif %}
+				{% if not server3Faction is empty %}
+					<div class="boxes {{ match.matchsettings.server3Faction }}">
+						<span class="empireLabel">
+						{% if match.serversmashdata.factiononly == 0 %}
+							{{server3Name}}
+						{% else %}
+							{{server3Faction|upper}}
+						{% endif %}
+						</span>
+						<span id="{{server3Faction}}Score" class="score">{{ server3Per }}</span>
+						<div class="empirelogo" id="{{server3Faction}}Logo"></div>
+					</div>
+				{% endif %}
+				</div>
+				<div id="buttonBar">
+					<div class="button killTots" id="killTotsButton">OVR</div>
+					<div class="button killGraph" id="killGraphButton">KIL</div>
+					<div class="button killStats" id="killStatsButton">STS</div>
+					<div class="button capTimeline" id="capTimelineButton">CAP</div>
+					<div id="timer">00:00:00</div>
+					<span id="timerLine">|</span>
+				</div>
+				<div id="territoryBar" style="background-color: #2A59D5; text-align: center;">
+					{% if not server1Faction is empty %}
+						<div class="tBar territory_section {{server1Faction}}" id="terr{{server1Faction}}" style="width: {{server1Per + diff / 3}}%" data-value="{{server1Per}}">
+						{% if (server1Per > 3) %} {{server1Per}}% {% endif %}</div>
+					{% endif %}
+
+					{% if not neutFaction is empty %}
+						<div class="tBar territory_section {{neutFaction}}" id="terr{{neutFaction}}" style="width: {{neutPer + diff / 3}}%" data-value="{{neutPer}}">
+						{% if (neutPer > 3) %}{{neutPer}}%{% endif %}</div>
+					{% elseif not server2Faction is empty %}
+						<div class="tBar territory_section {{server2Faction}}" id="terr{{server2Faction}}" style="width: {{server2Per + diff / 3}}%" data-value="{{server2Per}}">
+						{% if (server2Per > 3) %} {{server2Per}}% {% endif %}</div>
+					{% endif %}
+
+					{% if not neutFaction is empty %}
+						<div class="tBar territory_section {{server2Faction}}" id="terr{{server2Faction}}" style="width: {{server2Per + diff / 3}}%" data-value="{{server2Per}}">
+						{% if (server2Per > 3) %}{{server2Per}}%{% endif %}</div>
+					{% elseif not server3Faction is empty %}
+						<div class="tBar territory_section {{server3Faction}}" id="terr{{server3Faction}}" style="width: {{server3Per + diff / 3}}%" data-value="{{server3Per}}">
+						{% if (server3Per > 3) %} {{server3Per}}% {% endif %}</div>
+					{% endif %}
+
+					<div id="barOverlay">
+						<span id="capturedFacility" style="color: #F8D100;">Facility</span> <span id="capturedFacilityVerb">captured</span> by <span id="capturedFacilityFaction">TR</span>
+					</div>
+				</div>
+
+				<div id="populations">
+					<span class="text-center">Player Count</span>
+				{% if not server1Faction is empty %}
+					<span class="label {{server1Faction}} playerCounts" id="playerCount{{server1Faction|upper}}">0</span>
+				{% endif %}
+				{% if not server2Faction is empty %}
+					<span class="label {{server2Faction}} playerCounts" id="playerCount{{server2Faction|upper}}">0</span>
+				{% endif %}
+				{% if not server3Faction is empty %}
+					<span class="label {{server3Faction}} playerCounts" id="playerCount{{server3Faction|upper}}">0</span>
+				{% endif %}
+					<span class="label totals playerCounts" id="playerCountTotal"><b>0</b></span>
+				</div>
+
+				{% if match.status == 0 %}
+				<div id="bugMatchCountdown">
+					<h1>{{ server1Name }} vs {{ server2Name }} {% if not (server3Name == "UNKNOWN") %} vs {{ server3Name }}{% endif %}</h1>
+					<h3>Match begins in:</h3>
+					<h3 id="matchCountdown">00:00:00</h3>
+				</div>
+				{% endif %}
+
+			</div>
+
+			<div id="psbLogos">
+				<div class="reel" id="reel1"><img style="width: 140px;" id="PSBLogo" src="{{asset('assets/img/streaming/PBLogoWhite.png')}}"></div>
+				<div class="reel" id="reel2"><img style="width: 200px" id="PSBLogoWR" src="{{asset('assets/img/homepage/serversmash.png')}}"></div>
+			</div>
+
+			<div id="introImage">
+				<div id="introPSB">
+					<img src="/assets/img/streaming/PSBTextLight.png" />
+				</div>
+
+				{% if not server3Faction is empty %}
+					{% set class = "serverLogo3" %}
+				<div id="serverLogos3">
+				{% else %}
+					{% set class = "introLogo" %}
+				<div id="serverLogos">
+				{% endif %}
+					{% if not server1Faction is empty %}
+					<div class="{{ class }} introLeft {{ server1Name }}">
+						<img src="/assets/img/serverlogos/{{ server1Name }}400px.png" style="height: 400px">
+						<div class="detailTextLrg">{{ server1Name }}</div>
+					</div>
+					{% endif %}
+					{% if not server2Faction is empty %}
+					<div class="{{ class }} introRight {{ server2Name }}">
+						<img src="/assets/img/serverlogos/{{ server2Name }}400px.png" style="height: 400px">
+						<div class="detailTextLrg">{{ server2Name }}</div>
+					</div>
+					{% endif %}
+					{% if not server3Faction is empty %}
+					<div class="{{ class }} introCenter {{ server3Name }}">
+						<img src="/assets/img/serverlogos/{{ server3Name }}400px.png" style="height: 400px">
+						<div class="detailTextLrg">{{ server3Name }}</div>
+					</div>
+					{% endif %}
+					<div class="introVS detailText">vs</div>
+				</div>
+				<div class="smashInfo">
+					<p class="detailText">ServerSmash #{{ match.id }}</p>
+				</div>
+			</div>
+
+			<div id="map">
+				<h1>MAP</h1>
+			</div>
+
+			<div id="killTotals">
+				<table class="table table-condensed">
+					<tr>
+						<th>KIL</th>
+						<th>DTH</th>
+						<th>TKs</th>
+					</tr>
+					{% if not server1Faction is empty %}
+					<tr>
+						<td><span id="{{server1Faction}}Kills" class="label {{server1Faction}}">0</span></td>
+						<td><span id="{{server1Faction}}Deaths" class="label {{server1Faction}}">0</span></td>
+						<td><span id="{{server1Faction}}TKs" class="label {{server1Faction}}">0</span></td>
+					</tr>
+					{% endif %}
+					{% if not server2Faction is empty %}
+					<tr>
+						<td><span id="{{server2Faction}}Kills" class="label {{server2Faction}}">0</span></td>
+						<td><span id="{{server2Faction}}Deaths" class="label {{server2Faction}}">0</span></td>
+						<td><span id="{{server2Faction}}TKs" class="label {{server2Faction}}">0</span></td>
+					</tr>
+					{% endif %}
+					{% if not server3Faction is empty %}
+					<tr>
+						<td><span id="{{server3Faction}}Kills" class="label {{server3Faction}}"></span></td>
+						<td><span id="{{server3Faction}}Deaths" class="label {{server3Faction}}"></span></td>
+						<td><span id="{{server3Faction}}TKs" class="label {{server3Faction}}"></span></td>
+					</tr>
+					{% endif %}
+					<tr>
+						<td><span id="totalKills" class="label totals">{{ match.statsfactions.totalKills }}</span></td>
+						<td><span id="totalDeaths" class="label totals">{{ match.statsfactions.totalDeaths }}</span></td>
+						<td><span id="totalTKs" class="label totals">{{ match.statsfactions.totalTKs}}</span></td>
+					</tr>
+				</table>
+			</div>
+
+			<div id="playerStats">
+				<div id="leaderboards">
+					<!-- Nav tabs -->
+					<ul class="nav nav-tabs" role="tablist">
+						<li class="active"><a href="#players" role="tab" data-toggle="tab">Players</a></li>
+						<li><a href="#outfits" role="tab" data-toggle="tab">Outfits</a></li>
+						<li><a href="#weapons" role="tab" data-toggle="tab">Weapons</a></li>
+						<li><a href="#vehicles" role="tab" data-toggle="tab">Vehicles</a></li>
+					</ul>
+
+					<!-- Tab panes -->
+					<div class="tab-content">
+						<div class="input-group" id="playerSearch">
+							<input type="text" id="txtSearch" class="form-control" placeholder="Search for a Player" data-search="players" style="color: black" />
+						</div>
+						<span class="input-group-addon glyphicon glyphicon-search" id="searchButton"></span>
+						<div class="tab-pane active" id="players">
+							<div id="playerGrid" class="leaderboards"></div>
+						</div>
+						<div class="tab-pane" id="outfits">
+							<div id="outfitGrid" class="leaderboards"></div>
+						</div>
+						<div class="tab-pane" id="weapons">
+							<div id="weaponGrid" class="leaderboards"></div>
+						</div>
+						<div class="tab-pane" id="vehicles">
+							<div id="vehicleGrid" class="leaderboards"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div id="killGraph">
+				<div id="factionGraph" style="padding: 0px;">
+					<div id="factionChart"></div>
+				</div>
+			</div>
+
+			<div id="mapTimeline">
+				<div id="facilityChart"></div>
+			</div>
+
+			<div id="introVideo">
+
+			</div>
+
+			<div id="techdiff">
+				<img src="{{ asset('assets/img/streaming/TechDiffs.png')}}" />
+			</div>
+		</div>
+
+		<div id="streamAdmin" class="container text-center">
+			<div class='col-md-1'>
+				<h4>Status</h4>
+				<span class="btn btn-danger btn-block websocketStatus">Websocket Offline!</span>
+			</div>
+
+			<div class="col-md-6">
+				<h4>Commands</h4>
+				<div class="col-md-11">
+					<div>
+						<button id="introGFXButtonLrg" class="btn btn-default btn-lrg introGFXButton">Intro GFX</button>
+						<button id="introVideoButtonLrg" class="btn btn-default btn-lrg introVideoButton">Intro Vid</button>
+						<button id="bugButtonLrg" class="btn btn-default btn-primary btn-lrg bugButton">Bug</button>
+						<button id="killTotsButtonLrg" class="btn btn-default btn-lrg killTots">Kill Totals</button>
+						<button id="killGraphButtonLrg" class="btn btn-default btn-lrg killGraph">Kill Graph</button>
+						<button id="killStatsButtonLrg" class="btn btn-default btn-lrg killStats">Kill Statistics</button>
+						<button id="capTimelineButtonLrg" class="btn btn-default btn-lrg capTimeline">Map Timeline</button>
+						<button id="populationButtonLrg" class="btn btn-default btn-lrg populations">Populations</button>
+						<button id="techdiffButtonLrg" class="btn btn-warning btn-lrg techdiff">Tech Diff</button>
+					</div>
+					<!--<div style="margin-top: 20px;">
+						<button id="" class="btn btn-success disabled">Start Timer</button>
+						<button id="" class="btn btn-warning disabled">Pause Timer</button>
+						<button id="" class="btn btn-danger disabled">Reset Timer</button>
+						<button id="" class="btn btn-primary disabled">End Match</button>
+					</div>-->
+				</div>
+				<div class="col-md-1">
+					<button id="captureSim" class="btn btn-danger disabled">Reset</button>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<h4>Sizing</h4>
+				<button id="" class="btn btn-default disabled">1024x768</button>
+				<button id="" class="btn btn-default disabled">1152x864</button>
+				<button id="" class="btn btn-default disabled">1280x720</button>
+				<button id="" class="btn btn-default disabled">1280x1024</button>
+				<button id="" class="btn btn-default disabled">1600x900</button>
+				<button id="" class="btn btn-default disabled">1920x1080</button>
+			</div>
+		</div>
+	</div>
+
+{% endblock %}
+
+{% block javascript %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
+<script src="https://cdn.firebase.com/js/client/2.1.1/firebase.js"></script>
+
+<script>
+
+// Bug button actions
+
+var bugOpen = 1;
+var introGFXOpen = 0;
+var introVideoOpen = 0;
+var killTotalsOpen = 0;
+var statsOpen = 0;
+var killGraphOpen = 0;
+var mapTimelineOpen = 0;
+var populationsOpen = 0;
+var techdiffOpen = 0;
+
+$(".introGFXButton").click(function(event) {
+	toggleGFXIntro();
+});
+
+$(".introVideoButton").click(function(event) {
+	toggleVideoIntro();
+});
+
+$(".bugButton").click(function(event) {
+	toggleBug();
+});
+
+$(".killTots").click(function(event) {
+	toggleKillTotals();
+});
+
+$(".killStats").click(function(event) {
+	toggleStats();
+});
+
+$(".killGraph").click(function(event) {
+	toggleKillGraph();
+});
+
+$(".capTimeline").click(function(event) {
+	toggleCaptureTimeline();
+});
+
+$(".populations").click(function(event) {
+	togglePopulations();
+});
+
+$(".techdiff").click(function(event) {
+	toggleTechDiff();
+});
+
+var boxes = $(".boxes").length;
+var boxesSpace = $("#bugContainer").width();
+var boxWidth = Math.floor(boxesSpace / boxes);
+$(".boxes").css({"width": boxWidth+"px", "opacity": 1});
+
+{% set key = match.statsmap|last %}
+{% if key is empty %}
+	{% set key = {'controlVS': 33, 'controlNC': 33, 'controlTR': 33} %}
+{% endif %}
+{% set vsPer = key.controlVS %}
+{% set ncPer = key.controlNC %}
+{% set trPer = key.controlTR %}
+
+var vsScore = {{vsPer}};
+var ncScore = {{ncPer}};
+var trScore = {{trPer}};
+
+$("#vsScore").html(vsScore);
+$("#ncScore").html(ncScore);
+$("#trScore").html(trScore);
+
+
+function toggleGFXIntro()
+{
+	if (introGFXOpen == 0) // closed
+	{
+		introGFXOpen = 1;
+
+		if (bugOpen == 1)
+		{
+			toggleBug();
+		}
+
+		$("#introImage").fadeIn();
+
+		$("#introGFXButton").addClass("buttonActive");
+		$("#introGFXButtonLrg").addClass("btn-primary");
+	}
+	else
+	{
+		introGFXOpen = 0;
+
+		$("#introImage").fadeOut();
+
+		$("#introGFXButton").removeClass("buttonActive");
+		$("#introGFXButtonLrg").removeClass("btn-primary");
+	}
+}
+
+function toggleVideoIntro()
+{
+	if (introVideoOpen == 0) // closed
+	{
+		introVideoOpen = 1;
+
+		$("#introVideo").fadeIn();
+
+		$("#introVideoButton").addClass("buttonActive");
+		$("#introVideoButtonLrg").addClass("btn-primary");
+	}
+	else
+	{
+		introVideoOpen = 0;
+
+		$("#introVideo").fadeOut();
+
+		$("#introVideoButton").removeClass("buttonActive");
+		$("#introVideoButtonLrg").removeClass("btn-primary");
+	}
+}
+
+function toggleBug()
+{
+	if (bugOpen == 0) // closed
+	{
+		bugOpen = 1;
+
+		if (introGFXOpen == 1)
+		{
+			toggleGFXIntro();
+		}
+
+		if (introVideoOpen == 1)
+		{
+			toggleVideoIntro();
+		}
+
+		$("#bugContainer").stop(true, true).animate({"opacity": 1}, 1000, "swing", function()
+		{
+
+		});
+
+		$("#bugButton").addClass("buttonActive");
+		$("#bugButtonLrg").addClass("btn-primary");
+	}
+	else
+	{
+		bugOpen = 0;
+
+		$("#bugContainer").stop(true, true).animate({"opacity": 0}, 1000, "swing", function()
+		{
+
+		});
+
+		$("#bugButton").removeClass("buttonActive");
+		$("#bugButtonLrg").removeClass("btn-primary");
+	}
+}
+
+function toggleKillTotals()
+{
+	if (killTotalsOpen == 0) // closed
+	{
+		killTotalsOpen = 1;
+
+		$("#killTotals").stop(true, true).animate({"opacity": 1}, 1000, "swing", function()
+		{
+
+		});
+
+		$("#killTotsButton").addClass("buttonActive");
+		$("#killTotsButtonLrg").addClass("btn-primary");
+	}
+	else
+	{
+		killTotalsOpen = 0;
+
+		$("#killTotals").stop(true, true).animate({"opacity": 0}, 1000, "swing", function()
+		{
+
+		});
+
+		$("#killTotsButton").removeClass("buttonActive");
+		$("#killTotsButtonLrg").removeClass("btn-primary");
+	}
+}
+
+function toggleStats()
+{
+	if (statsOpen == 0) // closed
+	{
+		if (mapTimelineOpen == 1)
+		{
+			toggleCaptureTimeline();
+		}
+
+		statsOpen = 1;
+
+		$("#playerStats").stop(true, true).animate({"opacity": 1}, 1000, "swing", function()
+		{
+
+		});
+
+		$("#killStatsButton").addClass("buttonActive");
+		$("#killStatsButtonLrg").addClass("btn-primary");
+	}
+	else
+	{
+		statsOpen = 0;
+
+		$("#playerStats").stop(true, true).animate({"opacity": 0}, 1000, "swing", function()
+		{
+
+		});
+
+		$("#killStatsButton").removeClass("buttonActive");
+		$("#killStatsButtonLrg").removeClass("btn-primary");
+	}
+}
+
+function toggleKillGraph()
+{
+	if (killGraphOpen == 0) // closed
+	{
+		if (mapTimelineOpen == 1)
+		{
+			toggleCaptureTimeline();
+		}
+
+		killGraphOpen = 1;
+
+		$("#killGraph").stop(true, true).animate({"opacity": 1}, 1000, "swing", function()
+		{
+
+		});
+
+		$("#killGraphButton").addClass("buttonActive");
+		$("#killGraphButtonLrg").addClass("btn-primary");
+	}
+	else
+	{
+		killGraphOpen = 0;
+
+		$("#killGraph").stop(true, true).animate({"opacity": 0}, 1000, "swing", function()
+		{
+
+		});
+
+		$("#killGraphButton").removeClass("buttonActive");
+		$("#killGraphButtonLrg").removeClass("btn-primary");
+	}
+}
+
+function toggleCaptureTimeline()
+{
+	if (mapTimelineOpen == 0) // closed
+	{
+		if (killGraphOpen == 1)
+		{
+			toggleKillGraph();
+		}
+
+		if (statsOpen == 1)
+		{
+			toggleStats();
+		}
+
+		mapTimelineOpen = 1;
+
+		$("#mapTimeline").css("z-index", 10);
+		$("#mapTimeline").stop(true, true).animate({"opacity": 1}, 1000, "swing", function()
+		{
+
+		});
+
+		$("#capTimelineButton").addClass("buttonActive");
+		$("#capTimelineButtonLrg").addClass("btn-primary");
+	}
+	else
+	{
+		mapTimelineOpen = 0;
+
+		$("#mapTimeline").stop(true, true).animate({"opacity": 0, "z-index": 0}, 1000, "swing", function()
+		{
+
+			$("#mapTimeline").css("z-index", 0);
+		});
+
+		$("#capTimelineButton").removeClass("buttonActive");
+		$("#capTimelineButtonLrg").removeClass("btn-primary");
+	}
+}
+
+function togglePopulations()
+{
+	if (populationsOpen == 0) // closed
+	{
+		populationsOpen = 1;
+
+		$("#populations").css("z-index", 10);
+		$("#populations").stop(true, true).animate({"opacity": 1}, 1000, "swing", function()
+		{
+
+		});
+
+		$("#populationButton").addClass("buttonActive");
+		$("#populationButtonLrg").addClass("btn-primary");
+	}
+	else
+	{
+		populationsOpen = 0;
+
+		$("#populations").stop(true, true).animate({"opacity": 0, "z-index": 0}, 1000, "swing", function()
+		{
+
+			$("#mapTimeline").css("z-index", 0);
+		});
+
+		$("#populationButton").removeClass("buttonActive");
+		$("#populationButtonLrg").removeClass("btn-primary");
+	}
+}
+
+function toggleTechDiff()
+{
+	if (techdiffOpen == 0) // closed
+	{
+		techdiffOpen = 1;
+
+		$("#techdiff").fadeIn();
+
+		$("#techdiffButtonLrg").removeClass("btn-warning").addClass("btn-primary");
+	}
+	else
+	{
+		techdiffOpen = 0;
+
+		$("#techdiff").fadeOut();
+
+		$("#techdiffButtonLrg").removeClass("btn-primary").addClass("btn-warning");
+	}
+}
+
+var reels = $(".reel").length;
+var reelcount = 1;
+
+var firebaseRef = new Firebase("https://poonanners.firebaseio.com/psb/");
+firebaseRef.child("totals").on("value", function(snapshot)
+{
+	var values = snapshot.val();
+	/*$("#playerCountVS").html(values.vs);
+	$("#playerCountNC").html(values.nc);
+	$("#playerCountTR").html(values.tr);*/
+	$("#playerCountTotal").html('<b>'+values.total+'</b>');
+});
+
+/*setInterval(function()
+{
+	$("#reel"+reelcount).fadeOut(function()
+	{
+		if (reelcount == reels)
+		{
+			reelcount = 1;
+		}
+		else
+		{
+			reelcount++;
+		}
+
+		$("#reel"+reelcount).fadeIn();
+	});
+
+}, 60000)*/
+
+$(".nav-tabs").click(function(event) {
+	setTimeout(function()
+	{
+		pGrid.resizeCanvas();
+		oGrid.resizeCanvas();
+		wGrid.resizeCanvas();
+		vGrid.resizeCanvas();
+	}, 100)
+});
+
+</script>
+
+{% include 'PSBAdminBundle::Streaming/Streaming-jQuery.html.twig' with {'match': match} %}
+
+{% endblock %}

@@ -1,0 +1,18 @@
+<script>
+
+tinymce.init({
+	selector: '.editor',
+	plugins: [
+		"autolink lists link image charmap preview hr",
+		"searchreplace wordcount visualblocks visualchars code fullscreen",
+		"insertdatetime media nonbreaking table contextmenu directionality",
+		"emoticons paste textcolor colorpicker textpattern spellchecker"
+	],
+	toolbar1: "undo redo | styleselect | bold italic underline strikethrough | superscript subscript | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent",
+	toolbar2: "link image preview media | forecolor backcolor emoticons | spellchecker",
+	height: 400,
+	content_css : ["/assets/bootstrap/dist/css/bootstrap.css", "/assets/css/sitewide.css"],
+	body_class: "editor_body"
+});
+
+</script>

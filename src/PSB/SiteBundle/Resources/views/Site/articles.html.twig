@@ -1,0 +1,17 @@
+{% extends('PSBSiteBundle::public.html.twig') %}
+{% block body %}
+<div class="container content">
+	<div class="content_inner">
+		<div class="folded"><h2>{{ article.title }}</h2></div>
+		<div class="info">
+			<h4><b>Date:</b> {{article.datetime|date("dS M Y @ H:i") }}</h4>
+			<h4><b>Section:</b> {{article.category|matchType}}</h4>
+		</div>
+		{{ article.content | raw }}
+	</div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+
+{% endblock %} 

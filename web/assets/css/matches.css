@@ -1,0 +1,355 @@
+#populations
+{
+	position: absolute;
+	background-color: white;
+	padding: 5px;
+	width: 114px;
+	right: -118px;
+	top: -2px;
+	text-align: center;
+	border: 2px solid grey;
+	padding-top: 1px;
+	opacity: 0;
+}
+
+.playerCounts
+{
+	font-size: 25px !important;
+}
+
+#killTotals
+{
+	position: absolute;
+	top: 411px;
+	left: 288px;
+	z-index: 1;
+	font-family: 'Open Sans' sans-serif;
+	opacity: 0;
+}
+
+#killTotals table th
+{
+	text-align: center;
+	padding: 2px;
+	padding-bottom: 0px;
+	color: white;
+	border: 0;
+	font-size: 20px;
+}
+
+#killTotals table td
+{
+	padding: 2px;
+	padding-top: 1px;
+	border: 0;
+	width: 60px;
+	text-align: center;
+	vertical-align: middle;
+}
+
+#killTotals table td span
+{
+	font-size: 16px !important;
+}
+
+.totals
+{
+	background-color: #867100;
+}
+
+#territoryBar
+{
+	width: 100%;
+	height: 25px;
+	margin-top: -2px;
+	position: relative;
+}
+
+#barOverlay
+{
+	background-color: #2D1A1C;
+	width: 99%;
+	height: 21px;
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	text-align: center;
+	font-family: 'Open Sans' sans-serif;
+	color: white;
+	font-size: 18px;
+	line-height: 19px;
+	opacity: 0;
+}
+
+#boxBar, #buttonBar, #territoryBar
+{
+	display: inline-block;
+}
+
+#boxBar
+{
+	overflow: hidden;
+}
+
+.boxes
+{
+	float: left;
+	width: 150px;
+	height: 81px;
+	color: white;
+	position: relative;
+	opacity: 0;
+}
+
+.score
+{
+	position: absolute;
+	right: 8px;
+	bottom: -5px;
+	font-size: 50px;
+	color: white;
+	font-family: 'Open Sans', sans-serif;
+	z-index: 3;
+	font-weight: bold;
+}
+
+.empireLabel
+{
+	position: absolute;
+	font-family: 'Open Sans' sans-serif;
+	top: -8px;
+	left: 2px;
+	font-size: 40px;
+	z-index: 3;
+}
+
+.empirelogo
+{
+	position: absolute;
+	bottom: 2px;
+	right: 3px;
+	width: 58%;
+	opacity: 0.25;
+	z-index: 1;
+}
+
+.tBar
+{
+	float: left;
+	height: 100%;
+	text-align: center;
+	color: white;
+	font-size: 18px;
+}
+
+.territory_section.vs
+{
+	border: 1px solid rgb(179, 0, 248)
+}
+
+.territory_section.nc
+{
+	border: 1px solid #5967FF;
+}
+
+.territory_section.tr
+{
+	border: 1px solid #FF4F4F;;
+}
+
+.statsTotals
+{
+	background-color: rgb(58, 58, 58);
+	border-radius: 10px;
+	padding-bottom: 10px;
+}
+
+/* GRAPHS */
+
+#factionChart
+{
+	height: 400px;
+}
+
+#leaderboards, #graphs
+{
+	padding: 5px;
+	padding-bottom: 0px;
+	padding-top: 0px;
+	position: relative;
+}
+
+.leaderboards /* Actual leaderboard sizes */
+{
+	width: 100%;
+	height: 360px;
+	overflow: scroll;
+	overflow-x: hidden;
+	overflow-y: hidden;
+}
+
+#playerSearch
+{
+	width: 215px;
+	height: 40px;
+	position: absolute;
+	top: 1px;
+	right: 45px;
+	z-index: -1337;
+}
+
+#searchButton
+{
+	width: 40px;
+	height: 40px;
+	position: absolute;
+	top: 1px;
+	right: 5px;
+	border-radius: 5px 5px 0px 0px;
+	background-color: rgba(81, 81, 81, 0.8) !important;
+	border-left: 1px solid white;
+	border-top: 1px solid white;
+	border-right: 1px solid white;
+	border-bottom: 0;
+	color: white;
+	cursor: pointer;
+	line-height: 29px;
+	font-size: 16px;
+}
+
+#txtSearch
+{
+	z-index: -1000000;
+	height: 40px;
+	width: 0px;
+	border: 0;
+	opacity: 0;
+	float: left !important;
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+}
+
+/* Slick Grid Mods */
+
+.slick-cell
+{
+	color: white;
+	font-family: 'Open Sans' sans-serif;
+	font-size: 16px;
+}
+
+.slick-header-columns, .slick-headerrow-columns
+{
+	background-color: rgba(48, 48, 48, 0.8) !important;
+}
+
+.slick-column-name
+{
+	color: white !important;
+}
+
+.slick-row.even
+{
+	background-color: rgba(53, 53, 53, 1) !important;
+}
+
+.slick-row.odd
+{
+	background-color: rgba(66, 66, 66, 1) !important;
+}
+
+.slick-sort-indicator
+{
+	position: absolute;
+	left: -4px;
+	top: 6px;
+}
+
+.killCounts
+{
+	display: inline-block;
+	margin-left: 2px;
+	margin-right: 2px;
+	padding-top: 4px;
+	font-size: 13px;
+}
+
+.label-top
+{
+	width: 80px;
+	font-size: 18px;
+	background-color: #A3742A;
+}
+
+.totalheader
+{
+	padding-top: 5px;
+	margin-bottom: 0px;
+}
+
+.totalsLine
+{
+	text-align: center;
+	margin-top: 10px;
+}
+
+.inline-block
+{
+	display: inline-block;
+}
+
+.combatLead
+{
+	font-size: 22px;
+	text-align: center;
+}
+
+.leaflet-container {
+    background: #051010 !important;
+}
+
+#serverLogos
+{
+	overflow: hidden;
+}
+
+#serverLogos img
+{
+	width: 100%;
+}
+
+.detailText
+{
+	font-family: 'Open Sans', sans-serif;
+	font-size: 48px;
+	color: white;
+	font-weight: bold;
+	text-align: center;
+	text-transform: uppercase;
+}
+
+.valign
+{
+	position: relative;
+	top: 100%;
+	transform: translateY(100%);
+}
+
+.factionButtons
+{
+	margin-top: 10px;
+}
+
+.factionButtons:hover p
+{
+	color: rgb(205, 205, 205);
+	cursor: default;
+}
+
+@media screen and (max-width: 990px)
+{
+	.statsTotals
+	{
+		margin-bottom: 5px;
+	}
+}

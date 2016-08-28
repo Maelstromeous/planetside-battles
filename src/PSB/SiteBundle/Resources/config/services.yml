@@ -1,0 +1,5 @@
+services:
+    psb.frontend.twig:
+        class: PSB\SiteBundle\Twig\FrontendExtension
+        tags:
+            - { name: twig.extension }

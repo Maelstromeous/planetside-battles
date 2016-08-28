@@ -1,0 +1,39 @@
+{% extends('PSBAdminBundle::admintemplate.html.twig') %}
+
+{% block body -%}
+    <h1>User list</h1>
+
+    <table class="records_list table table-condensed">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Username</th>
+                <th>Rep</th>
+                <th>Admin</th>
+                <th>Super</th>
+                <th>Apikey</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for entity in entities %}
+            <tr>
+                <td><a href="{{ path('user_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
+                <td>{{ entity.username }}</td>
+                <td>{{ entity.rep }}</td>
+                <td>{{ entity.admin }}</td>
+                <td>{{ entity.super }}</td>
+                <td>{{ entity.apikey }}</td>
+                <td>
+                    <a href="{{ path('user_edit', { 'id': entity.id }) }}" class="btn btn-default btn-xs">edit</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+        <a href="{{ path('user_new') }}" class="btn btn-primary">
+            Create a new entry
+        </a>
+    </ul>
+    {% endblock %}

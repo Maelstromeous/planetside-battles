@@ -1,0 +1,442 @@
+{% extends('PSBSiteBundle::public.html.twig') %}
+{% block body %}
+	<div class="container content">
+		<div class="content_inner">
+			<div class="folded"><h2>ServerSmash Tournament 2015</h2></div>
+
+			<!--<div class="row" style="margin-bottom: 10px;">
+				<div class="col-md-12">
+					<img class="img-responsive" src="http://i.imgur.com/HhhmBs0.png"/>
+				</div>
+			</div>-->
+
+			{% if data.twitch == TRUE %}
+				<div class="embed-responsive embed-responsive-16by9" style="margin-bottom: 10px">
+					<iframe class="embed-responsive-item" src="http://www.twitch.tv/planetsidebattles/embed" frameborder="0" allowfullscreen></iframe>
+				</div>
+			{% else %}
+			<div class="embed-responsive embed-responsive-16by9" style="margin-bottom: 10px">
+				<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/fPZOw0T1ypY?autoplay=0" frameborder="0" allowfullscreen></iframe>
+			</div>
+			{% endif %}
+			<h1 class="text-center">The tournament has finished!</h1>
+			<h3 class="text-center">Miller is the 2015 Tournament winner!</h3>
+			<hr>
+			<div class="row">
+				<div class="col-md-4 col-md-offset-4">
+					<a href="/about/ServerSmash" class="btn btn-lg btn-block btn-primary"><b>How do I join ServerSmash?</b></a>
+				</div>
+			</div>
+			<hr>
+			<h2>What is ServerSmash?</h2>
+			<div class="row">
+				<div class="col-sm-12 col-md-6 border-right">
+					<p>
+						ServerSmash is a series of large server versus server events.  Teams from different Planetside 2 servers meet to do battle across a variety of maps. These events are designed to showcase combined arms warfare, requiring a massive amount of coordination; wars that typically span an entire continent.</p>
+					<p>
+						Matches take place on the locked competition server Jaeger, with each participant being loaned a competition account.  Graciously provided for Planetside Battles by Daybreak Game Company, each competition account has a character for each faction and enough certification points to unlock any equipment that the player requires. For the tournament, all match sizes are set at 240 vs 240 (or five platoons per side).
+					</p>
+					<p>
+						Intrigued? Confused? Just want to know more? Click below to find out more about what ServerSmash is, and the history of the event.
+					</p>
+					<div class="row">
+						<div class="col-md-8 col-md-offset-2">
+							<a href="/about/ServerSmash" class="btn btn-block btn-primary">More Info about ServerSmash</a>
+						</div>
+					</div>
+				</div>
+				<div class="col-sm-12 col-md-6">
+					<!-- 16:9 aspect ratio -->
+					<div class="embed-responsive embed-responsive-16by9">
+						<iframe class="embed-responsive-item" width="100%" height="315" src="https://www.youtube.com/embed/DC9Hu-i2Fbc" frameborder="0" allowfullscreen></iframe>
+					</div>
+				</div>
+			</div>
+			<hr>
+			<div class="row">
+				<div class="col-md-12">
+					<h1 class="text-center">Standings &amp; Statistics</h1>
+					<h4 class="text-center" style="color: #ddd">Figures on the left of the split are used for official scorekeeping purposes.</h4>
+					<p class="text-center">Standings are calculated by the number of wins by a server. In a situation where two servers are tied for wins, their score are then taken into account. Losses are irrelevent.</p>
+					<div class="table-responsive">
+						<table class="table table-striped">
+							<tr>
+								<th class="text-center">Logo</th>
+								<th class="text-center">Server</th>
+								<th class="text-center">Wins</th>
+								<th></th>
+								<th class="text-center">Losses</th>
+								<th class="text-center">Score</th>
+								<th class="text-center">Played</th>
+								<th class="text-center">Kills</th>
+								<th class="text-center">Deaths</th>
+								<th class="text-center">Avg K/D</th>
+								<th class="text-center">Captures</th>
+							</tr>
+							{% for standings in data.sortedStandings %}
+							<tr class="text-center">
+								<td class="col-xs-1">
+									<img src="/assets/img/serverlogos/{{standings.server|serverName}}400px.png" style="width: 100%;" />
+								</td>
+								<td style="vertical-align: middle;">
+									<h3 style="margin: 0;">{{ standings.server|serverName }}</h3>
+								</td>
+								<td style="vertical-align: middle;">
+									<h3 style="margin: 0; color: #ddd;"><b>{{ standings.wins }}</b></h3>
+								</td>
+								<td style="vertical-align: middle;">
+									<h4 style="margin: 0; color: #ddd;">-</h4>
+								</td>
+								<td style="vertical-align: middle;">
+									<h3 style="margin: 0; color: #ddd;"><b>{{ standings.losses }}</b></h3>
+								</td>
+								<td style="vertical-align: middle; border-right: 1px dashed #ddd">
+									<h3 style="margin: 0; color: #ddd;">{{ standings.score|number_format(0) }}</h3>
+								</td>
+
+								<td style="vertical-align: middle;">
+									<h4 style="margin: 0; color: #ddd;">{{ standings.plays|number_format(0) }}</h4>
+								</td>
+
+								{% set kills = "-" %}
+								{% set deaths = "-" %}
+								{% set kd = "-" %}
+								{% set captures = "-" %}
+
+								{% if not (standings.kills == 0) %}
+									{% set kd = standings.kills / standings.deaths %}
+									{% set kills = standings.kills|number_format(0) %}
+									{% set deaths = standings.deaths|number_format(0) %}
+									{% set kd = kd|number_format(2) %}
+									{% set captures = standings.captures|number_format(0) %}
+								{% endif %}
+								<td style="vertical-align: middle;">
+									<h4 style="margin: 0; color: #ddd;">{{ kills }}</h4>
+								</td>
+								<td style="vertical-align: middle;">
+									<h4 style="margin: 0; color: #ddd;">{{ deaths }}</h4>
+								</td>
+								<td style="vertical-align: middle;">
+									<h4 style="margin: 0; color: #ddd;">{{ kd }}</h4>
+								</td>
+								<td style="vertical-align: middle;">
+									<h4 style="margin: 0; color: #ddd;">{{ captures}}</h4>
+								</td>
+							</tr>
+							{% endfor %}
+						</table>
+					</div>
+				</div>
+			</div>
+			<hr>
+
+			<!-- Nav tabs -->
+			<ul class="nav nav-tabs" role="tablist">
+			<li role="presentation"><a href="#roundrobin" aria-controls="roundrobin" role="tab" data-toggle="tab">Round Robin</a></li>
+			<li role="presentation"><a href="#semi" aria-controls="semi" role="tab" data-toggle="tab">Semi Finals</a></li>
+			<li role="presentation" class="active"><a href="#championship" aria-controls="championship" role="tab" data-toggle="tab">Championship</a></li>
+			</ul>
+
+			<div class="tab-content">
+				<div role="tabpanel" class="tab-pane fade" id="roundrobin">
+					<h1>Round Robin Stage</h1>
+					<hr>
+					{% set break = 0 %}
+					{% for match in data['roundRobin'] %}
+						{% set break = break + 1 %}
+						{% if (break == 3) %}
+							{% set break = 1 %}
+							<div class="row" style="margin-top: 10px;"></div>
+							<hr>
+						{% endif %}
+						{% set matchStats = match.serversmashdata %}
+						{% if (matchStats.server1Faction == 1) %}
+							{% set faction1 = "vs" %}
+						{% elseif (matchStats.server1Faction == 2) %}
+							{% set faction1 = "nc" %}
+						{% elseif (matchStats.server1Faction == 3) %}
+							{% set faction1 = "tr" %}
+						{% endif %}
+						{% if (matchStats.server2Faction == 1) %}
+							{% set faction2 = "vs" %}
+						{% elseif (matchStats.server2Faction == 2) %}
+							{% set faction2 = "nc" %}
+						{% elseif (matchStats.server2Faction == 3) %}
+							{% set faction2 = "tr" %}
+						{% endif %}
+
+						{% if (matchStats.server1faction == 3 and matchStats.server2faction == 3) %}
+							{% set faction1 = "" %}
+							{% set faction2 = "" %}
+						{% endif %}
+					<div class="row tournamentRow" style="color: white">
+						<div class="col-xs-12 col-sm-2 tournamentInfo">
+							<span>
+								{% set hourFrom = match.startTime|date('H') %}
+								{% set hourTo = match.endTime|date('H') %}
+								{% set date = match.startTime|date('Y-m-j') %}
+
+								<a href="http://www.worldtimebuddy.com/?qm=1&lid=100,5,12,21&h=100&date={{date}}&sln={{hourFrom}}-{{hourTo}}&a=show" target="_blank">
+									<b>{{ match.startTime|date('jS M H:i') }} UTC</b>
+								</a>
+								<br>ServerSmash {{match.id}}
+								{% if (match.continent == "4") %}
+									{% set image = "hossin" %}
+								{% elseif (match.continent == "6") %}
+									{% set image = "amerish" %}
+								{% elseif (match.continent == "8") %}
+									{% set image = "esamir" %}
+								{% endif %}
+								<br><a href="/assets/img/tournamentmaps/{{image}}.jpg" target="_blank">{{match.continent|zoneName}} Map</a>
+							</span>
+						</div>
+						<div class="col-xs-4 col-sm-3">
+							<div class="tournamentFlag col-xs-4 hidden-xs hidden-sm">
+								<img src="/assets/img/serverlogos/{{match.serversmashdata.server1|serverName}}128px.png" style="width: 100%" />
+							</div>
+							<div class="tournamentServer col-xs-8">
+								<h2 class="{{faction1}}Text" style="text-align: left">{{match.serversmashdata.server1|serverName}}</h2>
+							</div>
+						</div>
+						<div class="col-xs-4 col-sm-2 tournamentScores">
+							{% if (match.status == "0") %}
+								<h3>TBD</h3>
+							{% else %}
+								{% set map = match.statsmap|last %}
+								{% if (map is empty) %}
+									<h3>TBD</h3>
+								{% else %}
+								<h3>{{ attribute(map, 'control'~faction1|upper) }}% - {{ attribute(map, 'control'~faction2|upper) }}%</h3>
+								{% endif %}
+							{% endif %}
+						</div>
+						<div class="col-xs-4 col-sm-3 border-right">
+							<div class="tournamentServer col-sm-12 col-md-8">
+								<h2 class="{{faction2}}Text" style="text-align: right">{{match.serversmashdata.server2|serverName}}</h2>
+							</div>
+							<div class="tournamentFlag col-md-4 hidden-xs hidden-sm">
+								<img src="/assets/img/serverlogos/{{match.serversmashdata.server2|serverName}}128px.png" style="width: 100%;" />
+							</div>
+						</div>
+						<div class="col-xs-12 visible-xs tournamentLinks">
+							<a href="/match/{{match.id}}" class="btn btn-primary btn-sm">Statistics</a>
+						</div>
+						<div class="col-xs-2 hidden-xs tournamentLinks">
+							<a href="/match/{{match.id}}" class="btn btn-primary btn-block">Statistics</a>
+						</div>
+					</div>
+					<hr>
+					{% endfor %}
+				</div>
+				<div role="tabpanel" class="tab-pane fade" id="semi">
+					<h1>Semi Finals</h1>
+					<hr>
+					{% if (data.semi is empty) %}
+					<h3 class="text-center">Details to be confirmed.</h3>
+					{% else %}
+
+						{% set break = 0 %}
+						{% for match in data.semi %}
+							{% set break = break + 1 %}
+							{% if (break == 3) %}
+								{% set break = 1 %}
+								<div class="row" style="margin-top: 10px;"></div>
+								<hr>
+							{% endif %}
+							{% set matchStats = match.serversmashdata %}
+							{% if (matchStats.server1Faction == 1) %}
+								{% set faction1 = "vs" %}
+							{% elseif (matchStats.server1Faction == 2) %}
+								{% set faction1 = "nc" %}
+							{% elseif (matchStats.server1Faction == 3) %}
+								{% set faction1 = "tr" %}
+							{% endif %}
+							{% if (matchStats.server2Faction == 1) %}
+								{% set faction2 = "vs" %}
+							{% elseif (matchStats.server2Faction == 2) %}
+								{% set faction2 = "nc" %}
+							{% elseif (matchStats.server2Faction == 3) %}
+								{% set faction2 = "tr" %}
+							{% endif %}
+
+							{% if (matchStats.server1faction == 3 and matchStats.server2faction == 3) %}
+								{% set faction1 = "" %}
+								{% set faction2 = "" %}
+							{% endif %}
+						<div class="row tournamentRow" style="color: white">
+							<div class="col-xs-12 col-sm-2 tournamentInfo">
+								<span>
+									{% set hourFrom = match.startTime|date('H') %}
+									{% set hourTo = match.endTime|date('H') %}
+									{% set date = match.startTime|date('Y-m-j') %}
+
+									<a href="http://www.worldtimebuddy.com/?qm=1&lid=100,5,12,21&h=100&date={{date}}&sln={{hourFrom}}-{{hourTo}}&a=show" target="_blank">
+										<b>{{ match.startTime|date('jS M H:i') }} UTC</b>
+									</a>
+									<br>ServerSmash {{match.id}}
+									{% if (match.continent == "4") %}
+										{% set image = "hossin" %}
+									{% elseif (match.continent == "6") %}
+										{% set image = "amerish" %}
+									{% elseif (match.continent == "8") %}
+										{% set image = "esamir" %}
+									{% endif %}
+									<br><a href="/assets/img/tournamentmaps/{{image}}.jpg" target="_blank">{{match.continent|zoneName}} Map</a>
+								</span>
+							</div>
+							<div class="col-xs-4 col-sm-3">
+								<div class="tournamentFlag col-xs-4 hidden-xs hidden-sm">
+									<img src="/assets/img/serverlogos/{{match.serversmashdata.server1|serverName}}128px.png" style="width: 100%" />
+								</div>
+								<div class="tournamentServer col-xs-8">
+									<h2 class="{{faction1}}Text" style="text-align: left">{{match.serversmashdata.server1|serverName}}</h2>
+								</div>
+							</div>
+							<div class="col-xs-4 col-sm-2 tournamentScores">
+								{% if (match.status == "0") %}
+									<h3>TBC</h3>
+								{% else %}
+									{% set map = match.statsmap|last %}
+									{% if (map is empty) %}
+										<h3>TBC</h3>
+									{% else %}
+									<h3>{{ attribute(map, 'control'~faction1|upper) }}% - {{ attribute(map, 'control'~faction2|upper) }}%</h3>
+									{% endif %}
+								{% endif %}
+							</div>
+							<div class="col-xs-4 col-sm-3">
+								<div class="tournamentServer col-sm-12 col-md-8">
+									<h2 class="{{faction2}}Text" style="text-align: right">{{match.serversmashdata.server2|serverName}}</h2>
+								</div>
+								<div class="tournamentFlag col-md-4 hidden-xs hidden-sm">
+									<img src="/assets/img/serverlogos/{{match.serversmashdata.server2|serverName}}128px.png" style="width: 100%;" />
+								</div>
+							</div>
+							<div class="col-xs-12 visible-xs tournamentLinks">
+								<a href="/match/{{match.id}}" class="btn btn-primary btn-sm">Statistics</a>
+							</div>
+							<div class="col-xs-2 hidden-xs tournamentLinks">
+								<a href="/match/{{match.id}}" class="btn btn-primary btn-sm">Statistics</a>
+							</div>
+						</div>
+						<hr>
+						{% endfor %}
+					{% endif %}
+				</div>
+				<div role="tabpanel" class="tab-pane fade in active" id="championship">
+					<h1>Championship Match</h1>
+					<hr>
+					{% if (data.championship is empty) %}
+					<h3 class="text-center">Details to be confirmed.</h3>
+					{% else %}
+
+						{% set break = 0 %}
+						{% for match in data.championship %}
+							{% set break = break + 1 %}
+							{% if (break == 3) %}
+								{% set break = 1 %}
+								<div class="row" style="margin-top: 10px;"></div>
+								<hr>
+							{% endif %}
+							{% set matchStats = match.serversmashdata %}
+							{% if (matchStats.server1Faction == 1) %}
+								{% set faction1 = "vs" %}
+							{% elseif (matchStats.server1Faction == 2) %}
+								{% set faction1 = "nc" %}
+							{% elseif (matchStats.server1Faction == 3) %}
+								{% set faction1 = "tr" %}
+							{% endif %}
+							{% if (matchStats.server2Faction == 1) %}
+								{% set faction2 = "vs" %}
+							{% elseif (matchStats.server2Faction == 2) %}
+								{% set faction2 = "nc" %}
+							{% elseif (matchStats.server2Faction == 3) %}
+								{% set faction2 = "tr" %}
+							{% endif %}
+
+							{% if (matchStats.server1faction == 3 and matchStats.server2faction == 3) %}
+								{% set faction1 = "" %}
+								{% set faction2 = "" %}
+							{% endif %}
+						<div class="row tournamentRow" style="color: white">
+							<div class="col-xs-12 col-sm-2 tournamentInfo">
+								<span>
+									{% set hourFrom = match.startTime|date('H') %}
+									{% set hourTo = match.endTime|date('H') %}
+									{% set date = match.startTime|date('Y-m-j') %}
+
+									<a href="http://www.worldtimebuddy.com/?qm=1&lid=100,5,12,21&h=100&date={{date}}&sln={{hourFrom}}-{{hourTo}}&a=show" target="_blank">
+										<b>{{ match.startTime|date('jS M H:i') }} UTC</b>
+									</a>
+									<br>ServerSmash {{match.id}}
+									{% if (match.continent == "4") %}
+										{% set image = "hossin" %}
+									{% elseif (match.continent == "6") %}
+										{% set image = "amerish" %}
+									{% elseif (match.continent == "8") %}
+										{% set image = "esamir" %}
+									{% endif %}
+									<br><a href="/assets/img/tournamentmaps/{{image}}.jpg" target="_blank">{{match.continent|zoneName}} Map</a>
+								</span>
+							</div>
+							<div class="col-xs-4 col-sm-3">
+								<div class="tournamentFlag col-xs-4 hidden-xs hidden-sm">
+									<img src="/assets/img/serverlogos/{{match.serversmashdata.server1|serverName}}128px.png" style="width: 100%" />
+								</div>
+								<div class="tournamentServer col-xs-8">
+									<h2 class="{{faction1}}Text" style="text-align: left">{{match.serversmashdata.server1|serverName}}</h2>
+								</div>
+							</div>
+							<div class="col-xs-4 col-sm-2 tournamentScores">
+								{% if (match.status == "0") %}
+									<h3>TBC</h3>
+								{% else %}
+									{% set map = match.statsmap|last %}
+									{% if (map is empty) %}
+										<h3>TBC</h3>
+									{% else %}
+									<h3>{{ attribute(map, 'control'~faction1|upper) }}% - {{ attribute(map, 'control'~faction2|upper) }}%</h3>
+									{% endif %}
+								{% endif %}
+							</div>
+							<div class="col-xs-4 col-sm-3">
+								<div class="tournamentServer col-sm-12 col-md-8">
+									<h2 class="{{faction2}}Text" style="text-align: right">{{match.serversmashdata.server2|serverName}}</h2>
+								</div>
+								<div class="tournamentFlag col-md-4 hidden-xs hidden-sm">
+									<img src="/assets/img/serverlogos/{{match.serversmashdata.server2|serverName}}128px.png" style="width: 100%;" />
+								</div>
+							</div>
+							<div class="col-xs-12 visible-xs tournamentLinks">
+								<a href="/match/{{match.id}}" class="btn btn-primary btn-sm">Statistics</a>
+							</div>
+							<div class="col-xs-2 hidden-xs tournamentLinks">
+								<a href="/match/{{match.id}}" class="btn btn-primary btn-sm">Statistics</a>
+							</div>
+						</div>
+						<hr>
+						{% endfor %}
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+{% block javascript %}
+	<script src="{{ asset('assets/js/jquery.countdown.min.js') }}"></script>
+
+	<script>
+
+		{% set firstMatch = data.all|first %}
+		var date = {{firstMatch.startTime}} * 1000;
+
+		$("#timer").countdown(date, function(event)
+		{
+			$(this).text(
+				event.strftime('%-D days %H:%M:%S')
+			);
+		});
+
+		$("#timerText").html('{{firstMatch.title}}<br>{{firstMatch.startTime|date("F jS H:i")}} UTC');
+	</script>
+{% endblock %}

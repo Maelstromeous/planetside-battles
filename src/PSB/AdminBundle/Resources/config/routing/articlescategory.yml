@@ -1,0 +1,30 @@
+articlescategory:
+    path:     /
+    defaults: { _controller: "PSBAdminBundle:ArticlesCategory:index" }
+
+articlescategory_show:
+    path:     /{id}/show
+    defaults: { _controller: "PSBAdminBundle:ArticlesCategory:show" }
+
+articlescategory_new:
+    path:     /new
+    defaults: { _controller: "PSBAdminBundle:ArticlesCategory:new" }
+
+articlescategory_create:
+    path:     /create
+    defaults: { _controller: "PSBAdminBundle:ArticlesCategory:create" }
+    requirements: { _method: post }
+
+articlescategory_edit:
+    path:     /{id}/edit
+    defaults: { _controller: "PSBAdminBundle:ArticlesCategory:edit" }
+
+articlescategory_update:
+    path:     /{id}/update
+    defaults: { _controller: "PSBAdminBundle:ArticlesCategory:update" }
+    requirements: { _method: post|put }
+
+articlescategory_delete:
+    path:     /{id}/delete
+    defaults: { _controller: "PSBAdminBundle:ArticlesCategory:delete" }
+    requirements: { _method: post|delete }

@@ -1,0 +1,18 @@
+{% extends('PSBAdminBundle::admintemplate.html.twig') %}
+
+{% block body -%}
+	<h1>Edit Article</h1>
+
+	{{ form(edit_form) }}
+
+	<a class="btn btn-default" href="{{ path('articles') }}">
+		Back to the list
+	</a>
+	<br><br>
+	{{ form(delete_form) }}</li>
+</ul>
+{% endblock %}
+
+{% block javascript %}
+	{% include('PSBAdminBundle::Common/tinymce.html.twig') %}
+{% endblock %}

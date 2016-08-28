@@ -1,0 +1,35 @@
+{% extends('PSBSiteBundle::public.html.twig') %}
+{% block body %}
+	<div class="container content">
+		<div class="content_inner">
+			<div class="folded"><h2>World Record Media</h2></div>
+			<br>
+			<h4 class="text-center">We have handpicked some amazing videos and photos of the <a href="/about/RecordSmash">Planetside 2 World Record Attempt</a> here for your viewing pleasure!</h4>
+			<hr>
+			<div class="row">
+				<div class="col-md-12" style="text-align: center;">
+					<a class="btn btn-lg btn-primary" href="#worldrecord">World Record Attempt</a>
+					<a class="btn btn-lg btn-primary" href="#montages">Montages</a>
+					<a class="btn btn-lg btn-primary" href="#perspectives">Perspectives</a>
+					<a class="btn btn-lg btn-primary" href="#highlights">Highlights</a>
+				</div>
+			</div>
+
+			<hr>
+
+			<h1 id="worldrecord">World Record Attempt</h1>
+			<p>Videos related to the Planetside Battles World Record Attempt (<a href="/about/RecordSmash">details</a>)</p>
+		</div>
+	</div>
+{% endblock %}
+{% block javascript %}
+{% endblock %}
+
+{% block stylesheets %}
+	<style>
+		.col-md-6
+		{
+			margin-top: 10px;
+		}
+	</style>
+{% endblock %}

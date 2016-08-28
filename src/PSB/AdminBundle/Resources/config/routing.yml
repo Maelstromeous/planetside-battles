@@ -1,0 +1,54 @@
+psb_admin_articlescategory:
+    resource: "@PSBAdminBundle/Resources/config/routing/articlescategory.yml"
+    prefix:   /articlescategory
+
+psb_admin_articles:
+    resource: "@PSBAdminBundle/Resources/config/routing/articles.yml"
+    prefix:   /articles
+
+psb_admin_user:
+    resource: "@PSBAdminBundle/Resources/config/routing/user.yml"
+    prefix:   /user
+
+psb_admin_pages:
+    resource: "@PSBAdminBundle/Resources/config/routing/pages.yml"
+    prefix:   /pages
+
+psb_admin_matches:
+    resource: "@PSBAdminBundle/Resources/config/routing/matches.yml"
+    prefix:   /matches
+
+admin_admin_users:
+    resource: "@PSBAdminBundle/Resources/config/routing/user.yml"
+    prefix:   /users
+
+admin_stream:
+    path: /streaming/{id}
+    defaults: { _controller: PSBAdminBundle:Streaming:streaming }
+
+admin_events:
+    resource: "@PSBAdminBundle/Resources/config/routing/events.yml"
+    prefix: /events
+
+admin_websocket:
+    path: /websocket
+    defaults: { _controller: PSBAdminBundle:Websocket:index }
+
+admin_homepage:
+    path:     /
+    defaults: { _controller: PSBAdminBundle:Default:index }
+
+admin_login:
+    path: /login
+    defaults: { _controller: PSBAdminBundle:Security:login }
+
+admin_login_check:
+    path: /login_check
+
+admin_logout:
+    pattern: /logout
+
+admin_clear_db_cache:
+    path: /deleteCache
+    defaults: { _controller: PSBAdminBundle:Default:deleteCache }
+

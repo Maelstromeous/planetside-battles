@@ -1,0 +1,92 @@
+{% extends('PSBSiteBundle::public.html.twig') %}
+
+{% block body %}
+
+<div class="container content">
+	<div class="content_inner">
+		<div class="folded"><h2>Match History &amp; Stats</h2></div>
+		<h3 class="text-center">Welcome to Planetside Battles&rsquo; Match History!</h3>
+		<p>This list is where you can find all of our recorded statistics, VODs, articles and match details. If there are details missing from the match, please let the PSB Staff know so we can correct it!</p>
+		<p>You can access all known VODs and Articles by clicking on the match title. Any PSB streams will be embedded into the page for your viewing lesuire.</p>
+
+		<div class="table-responsive">
+			<table class="table table-striped" style="margin-bottom: 0;">
+				<tr>
+					<th class="text-center">#</th>
+					<th class="text-center">Date</th>
+					<th class="text-center">Time</th>
+					<th>Event</th>
+					<th class="text-center">Winner</th>
+					<th class="text-center">Type</th>
+					<th class="text-center">Continent</th>
+					<th class="text-center">Stats</th>
+					<th class="text-center">VODs</th>
+					<th class="text-center">Articles</th>
+				</tr>
+			{% set date = "now"|date("U") %}
+			{% for match in matches %}
+				<tr>
+					<td class="text-center">
+						{{ match.id }}
+					</td>
+					<td class="text-center">
+						{{ match.startTime|date("d-M-Y") }}
+					</td>
+					<td class="text-center">
+						{{ match.startTime|date("H:i") }}
+					</td>
+					<td>
+						<b><a href="/match/{{match.id}}">{{ match.title }}</a></b>
+					</td>
+					<td class="text-center">
+						{% if match.endTime > date %}
+							-
+						{% elseif match.serversmashdata.winner is defined %}
+							{{ match.serversmashdata.winner|serverName(match.startTime) }}
+						{% endif %}
+					</td>
+					<td class="text-center">
+						{{ match.type|matchType }}
+					</td>
+					<td class="text-center">
+						{{ match.continent|zoneName }}
+					</td>
+					<td class="text-center">
+						{% if match.endTime > date %}
+							-
+						{% elseif match.statsAvailable == 1 %}
+							<span class="label label-success">Yes</span>
+						{% else %}
+							<span class="label label-danger">No</span>
+						{% endif %}
+					</td>
+					<td class="text-center">
+						{% if match.endTime > date %}
+							-
+						{% elseif not match.vods is empty %}
+							<span class="label label-success">Yes</span>
+						{% else %}
+							<span class="label label-danger">No</span>
+						{% endif %}
+					</td>
+					<td class="text-center">
+						{% if match.endTime > date %}
+							-
+						{% elseif not match.articles is empty %}
+							<span class="label label-success">Yes</span>
+						{% else %}
+							<span class="label label-danger">No</span>
+						{% endif %}
+					</td>
+				</tr>
+			{% endfor %}
+			</table>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+
+{% endblock %}

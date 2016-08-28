@@ -1,0 +1,160 @@
+<script type="text/javascript">
+
+{% if not (app.user is empty) %}
+var sessionkey = "{{ app.user.apikey }}";
+{% else %}
+var sessionkey = "0f73cac4f98819ab2ea412bab2e8970b694c0fe4";
+{% endif %}
+
+var wsUri = "ws://85.159.214.60:1338/?apikey="+sessionkey;
+var connected = false;
+var timer;
+
+console.log(wsUri);
+
+var websocket;
+
+function init()
+{
+	connected = false;
+	websocket = null;
+
+	$(".websocketStatus").removeClass("btn-success btn-danger").addClass("btn-warning").html("Reconnecting...");
+
+	console.log("INIT");
+	webSocket();
+}
+
+function webSocket()
+{
+	websocket = new WebSocket(wsUri);
+
+	websocket.onopen = function(message)
+	{
+		connected = true;
+		onOpen(message);
+	};
+	websocket.onclose = function(message)
+	{
+		onClose(message)
+	};
+	websocket.onmessage = function(message)
+	{
+		//console.log(message);
+		onMessage(message)
+	};
+	websocket.onerror = function(message)
+	{
+		onError(message)
+	};
+}
+
+function onOpen(messageData)
+{
+	console.log("Opened");
+
+	console.log("CONNECTED TO WEBSOCKET");
+	clearInterval(timer);
+
+	try {
+		onOpenPage(messageData);
+	}
+	catch (err) {
+		console.log(messageData);
+		console.log(err);
+	}
+}
+
+function onClose(messageData)
+{
+	connected = false;
+
+	if (typeof(timer) != "undefined")
+	{
+		clearInterval(timer);
+	}
+
+	setTimeout(function() // Reconnect
+	{
+		reconnect();
+	}, 2000)
+
+	$(".websocketStatus").removeClass("btn-success").addClass("btn-danger").html("Websocket Offline!");
+}
+
+function onMessage(messageData)
+{
+	try
+	{
+		var message = JSON.parse(messageData.data); // Parse into JSON object
+	}
+	catch(exception)
+	{
+		console.log(messageData);
+		console.log(exception);
+	}
+
+	if (message.messageType !== undefined && message.messageType != "keepalive")
+	{
+		//console.log(message);
+	}
+
+	if (message.response !== undefined && message.response == "auth")
+	{
+		if (message.state == 2)
+		{
+			$(".websocketStatus").removeClass("btn-danger btn-warning btn-success").addClass("btn-danger").html("SOE API Fail");
+		}
+		else
+		{
+			if (message.admin !== true)
+			{
+				$(".websocketStatus").removeClass("btn-danger").addClass("btn-warning").html("Connected, NO ADMIN");
+				console.log("NOT AUTHENTICATED!");
+			}
+			else
+			{
+				$(".websocketStatus").removeClass("btn-danger btn-warning").addClass("btn-success").html("Websocket Online");
+				console.log("AUTHENTICATED");
+			}
+		}
+	}
+	else
+	{
+		try {
+			onMessagePage(message);
+		} catch(e) {
+			console.log(message);
+			console.log(e);
+		}
+	}
+}
+
+function onClose(messageData)
+{
+	connected = false;
+
+	$(".websocketStatus").removeClass("btn-success").addClass("btn-danger").html("Websocket Offline!");
+
+	if (typeof(timer) != "undefined")
+	{
+		clearInterval(timer);
+	}
+
+	setTimeout(function() // Reconnect
+	{
+		init();
+	}, 2000)
+}
+
+function onError(messageData)
+{
+	console.log("UNABLE TO CONNECT TO WEBSOCKET");
+}
+
+$(window).load(function()
+{
+	init(); // First on load
+})
+
+</script>

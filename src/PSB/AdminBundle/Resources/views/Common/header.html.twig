@@ -1,0 +1,54 @@
+<nav class="navbar navbar-default" role="navigation">
+	<div class="container-fluid">
+	<!-- Brand and toggle get grouped for better mobile display -->
+	<div class="navbar-header">
+		<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#adminheader">
+		<span class="sr-only">Toggle navigation</span>
+		<span class="icon-bar"></span>
+		<span class="icon-bar"></span>
+		<span class="icon-bar"></span>
+		</button>
+		<a class="navbar-brand" href="/">PSB Admin</a>
+	</div>
+
+	<!-- Collect the nav links, forms, and other content for toggling -->
+	<div class="collapse navbar-collapse" id="adminheader">
+		{% if (app.user) %}
+		<ul class="nav navbar-nav">
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown">Event Admin <span class="caret"></span></a>
+				<ul class="dropdown-menu" role="menu">
+					{% if (app.user) %}
+						<li><a href="{{path('admin_events_create')}}">Create new Match</a></li>
+						<li class="divider"></li>
+					{% endif %}
+					<li><a href="{{path('matches')}}">Event History</a></li>
+					<li class="divider"></li>
+					<li><a href="{{path('admin_websocket')}}">Websocket Status</a></li>
+					<li class="divider"></li>
+					<li><a href="#">Server Smash Events</a></li>
+					<!--<li><a href="#">Outfit vs Outfit</a></li>
+					<li><a href="#">PSBL Matches</a></li>
+					<li><a href="#">ArmorSide Matches</a></li>-->
+				</ul>
+			</li>
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle" data-toggle="dropdown">Frontend Admin <span class="caret"></span></a>
+				<ul class="dropdown-menu" role="menu">
+					<li><a href="{{path('pages')}}">Static Page Management</a></li>
+					<li class="divider"></li>
+					<li><a href="{{path('articles')}}">Article Management</a></li>
+					<li><a href="{{path('articlescategory')}}">Article Category Management</a></li>
+					<li class="divider"></li>
+					<li><a href="#">Carousel Management</a></li>
+				</ul>
+			</li>
+		</ul>
+		<ul class="nav navbar-nav navbar-right">
+			<li><a href="{{ path('admin_clear_db_cache') }}"><span class="label label-danger">Clear Cache</span></a></li>
+			<li><a href="{{ path('admin_logout')}}"><b>{{ app.user.username }}</b> - Logout</a></li>
+			<li><a style="padding: 0; margin: 0; margin-top: 7px" href="{{ path('admin_websocket') }}"><button class="btn btn-danger websocketStatus">Websocket Offline</button></a>
+		</ul>
+		{% endif %}
+	</div><!-- /.navbar-collapse -->
+</nav>

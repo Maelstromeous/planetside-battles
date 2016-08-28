@@ -1,0 +1,41 @@
+{% extends('PSBAdminBundle::admintemplate.html.twig') %}
+
+{% block body -%}
+    <h1>Matches list</h1>
+    <table class="records_list table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Status</th>
+                <th>Type</th>
+                <th>Starttime</th>
+                <th>Endtime</th>
+                <th>Server</th>
+                <th>Continent</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for entity in entities %}
+            <tr>
+                <td><a href="{{ path('matches_show', { 'id': entity.id }) }}">{{ entity.id }}</a></td>
+                <td>{{ entity.title }}</td>
+                <td>{{ entity.status }}</td>
+                <td>{{ entity.type }}</td>
+                <td>{{ entity.startTime|date("d-M-Y H:i") }}</td>
+                <td>{{ entity.endTime|date("d-M-Y H:i") }}</td>
+                <td>{{ entity.server|serverName }}</td>
+                <td>{{ entity.continent|zoneName }}</td>
+                <td>
+                    <a class="btn btn-default btn-sm" href="{{ path('matches_show', { 'id': entity.id }) }}">show</a>
+                    <a class="btn btn-primary btn-sm" href="{{ path('matches_edit', { 'id': entity.id }) }}">edit</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <a class="btn btn-primary" href="{{ path('matches_new') }}">
+        Create a new entry
+    </a>
+    {% endblock %}

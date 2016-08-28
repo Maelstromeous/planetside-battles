@@ -1,0 +1,30 @@
+pages:
+    path:     /
+    defaults: { _controller: "PSBAdminBundle:Pages:index" }
+
+pages_show:
+    path:     /{id}/show
+    defaults: { _controller: "PSBAdminBundle:Pages:show" }
+
+pages_new:
+    path:     /new
+    defaults: { _controller: "PSBAdminBundle:Pages:new" }
+
+pages_create:
+    path:     /create
+    defaults: { _controller: "PSBAdminBundle:Pages:create" }
+    requirements: { _method: post }
+
+pages_edit:
+    path:     /{id}/edit
+    defaults: { _controller: "PSBAdminBundle:Pages:edit" }
+
+pages_update:
+    path:     /{id}/update
+    defaults: { _controller: "PSBAdminBundle:Pages:update" }
+    requirements: { _method: post|put }
+
+pages_delete:
+    path:     /{id}/delete
+    defaults: { _controller: "PSBAdminBundle:Pages:delete" }
+    requirements: { _method: post|delete }

@@ -1,0 +1,3 @@
+admin_events_create:
+    path:     /
+    defaults: { _controller: "PSBAdminBundle:Events:index" }

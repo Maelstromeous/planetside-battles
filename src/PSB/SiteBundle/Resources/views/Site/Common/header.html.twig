@@ -1,0 +1,111 @@
+<div class="container-fluid">
+	<div class="row">
+		<div id="carousel-header" class="carousel slide" data-ride="carousel">
+			<div class="carousel-inner" role="listbox">
+				<div class="item active">
+					<img src="{{ asset('assets/img/slider/PSBLogo.png') }}" />
+				</div>
+				<div class="item">
+					<a href="/about/RecordSmash">
+						<img src="{{ asset('assets/img/slider/slider2.png') }}" />
+					</a>
+				</div>
+				<!--<div class="item">
+					<img src="{{ asset('assets/img/slider/slide3.jpg') }}" />
+				</div>-->
+			</div>
+			<a class="left carousel-control" href="#carousel-header" role="button" data-slide="prev">
+				<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+			</a>
+			<a class="right carousel-control" href="#carousel-header" role="button" data-slide="next">
+				<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+			</a>
+		</div>
+	</div>
+</div>
+	<nav class="navbar navbar-inverse">
+		<div class="container">
+			<div class="container-fluid">
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#sitewideNav">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+				</div>
+			</div>
+			<div class="collapse navbar-collapse" id="sitewideNav">
+				<ul class="nav navbar-nav">
+					<a class="navbar-brand" href="/">
+						<img alt="Brand" src="{{ asset('assets/img/psbcubesmall.png')}}"/>
+					</a>
+					<li><a href="/about/PSB">About PSB</a></li>
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">PSB Events <span class="caret"></span></a>
+						<ul class="dropdown-menu" role="menu">
+							<li><a href="/about/ServerSmash">ServerSmash</a></li>
+							<li><a href="/about/PSBL">Planetside Battles League</a></li>
+							<li><a href="/about/ArmorSide">ArmorSide</a></li>
+							<li><a href="/about/OvO">Outfit vs Outfit</a></li>
+							<li><a href="/about/Pickup">Public Pickup</a></li>
+							<li><a href="/about/LaneSmash">LaneSmash</a></li>
+							<li class="divider"></li>
+							<li><a href="/about/RecordSmash">World Record Attempt</a></li>
+						</ul>
+					</li>
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">ServerSmash <span class="caret"></span></a>
+						<ul class="dropdown-menu" role="menu">
+							<li><a href="/ServerSmash/tournament2015">ServerSmash Tournament 2015</a></li>
+							<li class="divider"></li>
+							<li class="dropdown-header">ServerSmash Information</li>
+							<li><a href="/about/ServerSmash">About ServerSmash</a></li>
+							<li><a href="/ServerSmash/Server-Reps">Server Representatives</a></li>
+							<li><a href="/about/FairnessDoctrine">Fairness Doctrine</a></li>
+						</ul>
+					</li>
+					<!--<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">PSBL <span class="caret"></span></a>
+						<ul class="dropdown-menu" role="menu">
+							<li class="dropdown-header">PSBL EU</li>
+							<li><a href="/PSBL-EU/Rules">Rules and Organisation</a></li>
+							<li><a href="/PSBL-EU/Maps">Maps</a></li>
+							<li><a href="/PSBL-EU/Season-1-Results">Season 1 Results</a></li>
+							<li><a href="/PSBL-EU/Ranking-Season-2">Ranking Season 2</a></li>
+							<li class="dropdown-header">PSBL NA</li>
+							<li><a href="/PSBL-NA/Rules">Rules and Organisation</a></li>
+							<li><a href="/PSBL-NA/Maps">Maps</a></li>
+							<li><a href="/PSBL-NA/NADiv1">NA Division 1</a></li>
+							<li><a href="/PSBL-NA/NADiv2">NA Division 2</a></li>
+							<li class="dropdown-header">PSBL Briggs</li>
+							<li><a href="/PSBL-Briggs/Rules">Rules and Organisation</a></li>
+							<li><a href="/PSBL-Briggs/Maps">Maps</a></li>
+							<li><a href="/PSBL-Briggs/Season-1-Results">Season 1 Results</a></li>
+						</ul>
+					</li>
+					-->
+					<li><a href="http://forums.planetsidebattles.org">Forums</a></li>
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Media <span class="caret"></span></a>
+						<ul class="dropdown-menu" role="menu">
+							<li><a href="/articles">Articles / Literature</a></li>
+							<li class="divider"></li>
+							<li><a href="/media/worldrecord">World Record Media Showcase</a></li>
+							<li class="divider"></li>
+							<li><a href="/media/youtube">YouTube Showcase</a></li>
+							<li><a href="/media/vods">Video On Demand (VODs)</a></li>
+							<!--<li><a href="/media/gallery">Gallery</a></li>-->
+						</ul>
+					</li>
+					<li><a href="{{path('psb_site_match_list')}}">Matches</a></li>
+				</ul>
+				<ul class="nav navbar-nav navbar-right hidden-sm" id="navbar_shelf">
+					<li class="social_icon"><a href="http://twitter.com/ps2battles"><img src="{{ asset('assets/img/twitter-32.png') }}" style="margin-right: 0px;"/></a></li>
+					<li class="social_icon"><a href="http://reddit.com/r/planetsidebattles"><img src="{{ asset('assets/img/reddit-32.png') }}" /></a></li>
+					<li class="social_icon"><a href="http://twitch.tv/planetsidebattles"><img src="{{ asset('assets/img/twitch-32.png') }}" /></a></li>
+				</ul>
+			</div>
+		</div>
+	</nav>
+</div>

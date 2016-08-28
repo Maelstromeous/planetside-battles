@@ -1,0 +1,31 @@
+{% extends('PSBSiteBundle::public.html.twig') %}
+{% block body %}
+<div class="container content">
+	<div class="content_inner">
+		<div class="folded"><h2>Articles</h2></div>
+		<p>Below you can browse our list of Articles.</p>
+		<div class="table-container">
+			<table class="table table-condensed ">
+				<tr>
+					<th>Title</th>
+					<th>Section</th>
+					<th>Author</th>
+					<th>Match?</th>
+				</tr>
+			{% for article in articles %}
+				<tr>
+					<td><a href="/articles/{{article.path}}">{{ article.title }}</a></td>
+					<td>{{ article.category }}</td>
+					<td>{{ article.author }}</td>
+					<td></td>
+				</tr>
+			{% endfor %}
+			</table>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+
+{% endblock %}

@@ -1,0 +1,21 @@
+<!-- remember to include CSS -->
+
+{% block javascript %}
+<script type="text/javascript" src="{{ asset('assets/js/moment.js') }}"></script>
+<script type="text/javascript" src="{{ asset('assets/js/bootstrapdatetimepicker.js') }}"></script>
+
+<script type="text/javascript">
+
+$(".datetimepicker").datetimepicker({
+	format: 'DD-MMM-YYYY HH:mm:ss',
+	sideBySide: true
+});
+
+$(".datetimepickerunix").datetimepicker({
+	format: 'X',
+	sideBySide: true
+});
+
+</script>
+
+{% endblock %}

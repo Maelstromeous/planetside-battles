@@ -1,0 +1,110 @@
+span.text_darkblue {
+    color: rgb(075,075,175);
+}
+
+i.icon,div.facility_icon {
+    background-image: url("../img/sprites/sprites.png");
+    height: 32px;
+    width: 32px;
+    max-height: 32px;
+    max-width: 32px;
+    display: inline-block;
+    pointer-events: none;
+    overflow: visible;
+}
+
+i.facility_2_0,div.facility_2_0 {
+    background-position: -32px -0px;
+}
+
+i.facility_2_1,div.facility_2_1 {
+    background-position: -32px -96px;
+}
+
+i.facility_2_2,div.facility_2_2 {
+    background-position: -32px -32px;
+}
+
+i.facility_2_3,div.facility_2_3 {
+    background-position: -32px -64px;
+}
+
+i.facility_3_0,div.facility_3_0 {
+    background-position: -64px 0px;
+}
+
+i.facility_3_1,div.facility_3_1 {
+    background-position: -64px -96px;
+}
+
+i.facility_3_2,div.facility_3_2 {
+    background-position: -64px -32px;
+}
+
+i.facility_3_3,div.facility_3_3 {
+    background-position: -64px -64px;
+}
+
+i.facility_4_0,div.facility_4_0 {
+    background-position: -96px 0px;
+}
+
+i.facility_4_1,div.facility_4_1 {
+    background-position: -96px -96px;
+}
+
+i.facility_4_2,div.facility_4_2 {
+    background-position: -96px -32px;
+}
+
+i.facility_4_3,div.facility_4_3 {
+    background-position: -96px -64px;
+}
+
+i.facility_5_0,div.facility_5_0 {
+    background-position: -128px 0px;
+}
+
+i.facility_5_1,div.facility_5_1 {
+    background-position: -128px -96px;
+}
+
+i.facility_5_2,div.facility_5_2 {
+    background-position: -128px -32px;
+}
+
+i.facility_5_3,div.facility_5_3 {
+    background-position: -128px -64px;
+}
+
+i.facility_6_0,div.facility_6_0 {
+    background-position: -160px 0px;
+}
+
+i.facility_6_1,div.facility_6_1 {
+    background-position: -160px -96px;
+}
+
+i.facility_6_2,div.facility_6_2 {
+    background-position: -160px -32px;
+}
+
+i.facility_6_3,div.facility_6_3 {
+    background-position: -160px -64px;
+}
+
+i.facility_7_0,div.facility_7_0 {
+    background-position: 0px 0px;
+}
+
+i.facility_7_1,div.facility_7_1 {
+    background-position: 0px -96px;
+}
+
+i.facility_7_2,div.facility_7_2 {
+    background-position: 0px -32px;
+}
+
+i.facility_7_3,div.facility_7_3 {
+    background-position: 0px -64px;
+}

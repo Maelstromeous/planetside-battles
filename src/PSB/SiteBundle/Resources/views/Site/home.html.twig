@@ -1,0 +1,82 @@
+{% extends('PSBSiteBundle::public.html.twig') %}
+{% block body %}
+<div class="container content">
+	<div class="jumbotron text-center">
+		<h1>We have a winner!</h1>
+		<img src="{{ asset('assets/img/millertournamentlogosmall.png') }}" style="height: 500px">
+		<h3>Miller has won the 2015 ServerSmash tournament!</h3>
+		<a class="btn btn-primary btn-lg" href="http://www.twitch.tv/planetsidebattles/v/28425783">
+			Twitch VOD
+		</a>
+		<a class="btn btn-primary btn-lg" href="/match/58">
+			Match Statistics
+		</a>
+	</div>
+	<div class="content_inner home_container">
+		<div class="row">
+			<div class="col-md-3 col-sm-6 col-xs-6 home_col home_top_row">
+				<a href="/about/ServerSmash"><img src="{{ asset('assets/img/homepage/serversmash.png') }}" /></a>
+			</div>
+			<div class="col-md-3 col-sm-6 col-xs-6 home_col home_top_row">
+				<a href="/about/PSBL"><img src="{{ asset('assets/img/homepage/psblnew.png') }}" /></a>
+			</div>
+			<div class="col-md-3 col-sm-6 col-xs-6 home_col">
+				<a href="/about/LaneSmash"><img src="{{ asset('assets/img/homepage/lanesmash.png') }}" /></a>
+			</div>
+			<div class="col-md-3 col-sm-6 col-xs-6 home_col">
+				<a href="/about/OvO"><img src="{{ asset('assets/img/homepage/ovonew.png') }}" /></a>
+			</div>
+		</div>
+	</div>
+	<div class="content_inner home_container text-center">
+		<a class="btn btn-success btn-lg" href="/donate">Help us keep operating!</a>
+	</div>
+	<div class="content_inner home_container">
+		<div class="row">
+			<h2 class="text-center">Upcoming Matches</h2>
+			<iframe src="https://www.google.com/calendar/embed?title=Upcoming Matches&amp;mode=AGENDA&amp;height=400&amp;wkst=2&amp;bgcolor=%23FFFFFF&amp;src=jtn27ifac6dot0lmmjb33nr23c%40group.calendar.google.com&amp;color=%235F6B02&amp;ctz=Etc%2FGMT" style=" border-width:0; padding: 10px; " width="100%" height="400" frameborder="0" scrolling="no"></iframe>
+		</div>
+	</div>
+	<div class="content_inner home_container">
+		<div class="row">
+			<div class="col-md-3 col-sm-6 home_col noshadow">
+				<div>
+					<a class="twitter-timeline" href="https://twitter.com/PS2Battles" data-widget-id="551249196108754945">Tweets by @PS2Battles</a>
+					<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+				</div>
+			</div>
+			<div class="col-md-6 hidden-sm home_col noback">
+				<div class="row noshadow">
+					<div class="col-md-6 col-sm-6 placeholder home_col">
+						<a href="/media/youtube"><img src="{{asset('assets/img/homepage/youtubeshowcase.png')}}"></a>
+					</div>
+					<div class="col-md-6 col-sm-6 placeholder">
+						<a href="/articles"><img src="{{asset('assets/img/homepage/articles.png')}}"></a>
+					</div>
+				</div>
+				<div class="row noshadow">
+					<div class="home_spacer"></div>
+				</div>
+
+				<div class="row noshadow">
+					<div class="col-md-12 noshadow noback">
+						<div class="videoWrapper noshadow noback">
+							<iframe id="ytplayer" type="text/html"
+								src="https://www.youtube.com/embed/?listType=user_uploads&list=planetsidebattles"
+								frameborder="0" allowfullscreen>
+							</iframe>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-3 col-sm-6 home_col noshadow">
+				<div>
+					<script src="http://www.reddit.com/r/PlanetsideBattles/hot/.embed?limit=5&t=all" type="text/javascript"></script>
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>
+{% endblock %}

@@ -1,0 +1,2447 @@
+<script src="{{asset('assets/js/jquery.event.drag-2.2.js')}}"></script>
+
+<script src="{{asset('assets/js/slick.core.js')}}"></script>
+<script src="{{asset('assets/js/slick.grid.js')}}"></script>
+<script src="{{asset('assets/js/slick.dataview.js')}}"></script>
+
+<script src="{{asset('assets/js/highcharts/highstock.js')}}"></script>
+<!--<script src="{{asset('assets/js/highcharts/highcharts-more.js')}}"></script>-->
+<script src="{{asset('assets/js/highcharts/exporting.js')}}"></script>
+
+<script>
+
+{% if (match.statsAvailable == true) %}
+var players = {{match.metrics["statsPlayers"]|raw}};
+var outfits = {{match.metrics["statsOutfits"]|raw}};
+var weapons = {{match.metrics["statsWeapons"]|raw}};
+var vehicles = {{match.metrics["statsVehicles"]|raw}};
+var statsFactions = {{match.metrics["statsFactions"]|raw}};
+
+var killCount = statsFactions.totalKills;
+var deathCount = statsFactions.totalDeaths;
+var TKCount = statsFactions.totalTKs;
+var suicideCount = statsFactions.totalSuicides;
+
+var VSKills = statsFactions.killsVS;
+var NCKills = statsFactions.killsNC;
+var TRKills = statsFactions.killsTR;
+
+var VSDeaths = statsFactions.deathsVS;
+var NCDeaths = statsFactions.deathsNC;
+var TRDeaths = statsFactions.deathsTR;
+
+var VSTKs = statsFactions.teamKillsVS;
+var NCTKs = statsFactions.teamKillsNC;
+var TRTKs = statsFactions.teamKillsTR;
+
+var VSSuicides = statsFactions.suicidesVS;
+var NCSuicides = statsFactions.suicidesNC;
+var TRSuicides = statsFactions.suicidesTR;
+
+{% if (match.metrics["statsCharacters"]) %}
+var smashchars = {{match.metrics["statsCharacters"]|raw}};
+{% else %}
+var smashchars = null;
+{% endif %}
+
+{% else %}
+var players = null;
+var outfits = null;
+var weapons = null;
+var vehicles = null;
+var matchInfo = null;
+var statsFactions = null;
+{% endif %}
+
+var matchInfo = {{match.metrics["matchInfo"]|raw}};
+
+var WepData = {{match.supplimental["WeaponData"]|raw}};
+var VehData = {{match.supplimental["VehicleData"]|raw}};
+var FacData = {{match.supplimental["FacilityData"]|raw}};
+var FacDataInverse = {{match.supplimental["FacilityDataInverse"]|raw}};
+
+{% if not (match.metrics["initialMap"] is empty) %}
+var mapStats = {{match.metrics["initialMap"]|raw}};
+{% else %}
+var mapStats = null;
+{% endif %}
+
+var timer;
+var refreshTimer;
+
+{% if match.id >= 32 %}
+if (inProgress != 0)
+{
+	init_map(function()
+	{
+		console.log("Map loaded!");
+	});
+
+	{% if not (match.metrics["mapStats"] == "nodata") %}
+	var mapReplace = {{match.metrics["mapStats"]|raw}};
+
+	if (mapStats != null)
+	{
+		for (var i = 0; i < mapReplace.length; i++) {
+			var facID = mapReplace[i]["facilityID"];
+			var facOwner = mapReplace[i]["facilityOwner"];
+
+			console.log(facID);
+			console.log("owner: "+facOwner);
+
+			if (mapStats[facID] === undefined)
+			{
+				console.log("UNDEFINED FACILITY: "+facID);
+			}
+			else
+			{
+				mapStats[facID]["facilityOwner"] = facOwner;
+			}
+		};
+	}
+	{% endif %}
+}
+{% endif %}
+
+$(window).load(function()
+{
+	{% if match.id >= 32 %}
+		if (inProgress != 0)
+		{
+			refreshMap();
+			pRefresh = true; oRefresh = true; wRefresh = true; vRefresh = true;
+			refreshStats();
+		}
+	{% endif %}
+});
+
+// SET TOTALS DISPLAYS
+
+var playerData = [];
+var outfitData = [];
+var weaponData = [];
+var vehicleData = [];
+
+var vehNanite = {
+	1: 50,
+	2: 200,
+	3: 350,
+	4: 450,
+	5: 450,
+	6: 450,
+	7: 350,
+	8: 350,
+	9: 350,
+	10: 450,
+	11: 450,
+	12: 150,
+	13: 0, // Wat?
+	14: 250,
+	100: 0, // Wat?
+	101: 0,
+	102: 0,
+	103: 0, // Wat??
+	127: 0, // Wat??
+	150: 0,
+	151: 0,
+	152: 0
+};
+
+var vehicleNames = {
+	1: "Flash",
+	2: "Sunderer",
+	3: "Lightning",
+	4: "Magrider",
+	5: "Vanguard",
+	6: "Prowler",
+	7: "Scythe",
+	8: "Reaver",
+	9: "Mosquito",
+	10: "Liberator",
+	11: "Galaxy",
+	12: "Harasser",
+	13: "Drop Pod",
+	14: "Valkrye",
+	100: "AI Base Turret",
+	101: "AI Mana Turret",
+	102: "AV Mana Turret",
+	103: "Spitfire Turret",
+	127: "AA Base Turret?",
+	150: "AA Base Turret",
+	151: "AV Base Turret",
+	1012: "Phonenix Missle"
+};
+
+var totalNanites = 0;
+
+var vscolor = '#C740F5';
+var vsMapColor = '#CF6DDF';
+var nccolor = '#0089FC';
+var ncMapColor = '#38F';
+var trcolor = '#CF0202';
+var trMapColor = '#FF0000';
+var nscolor = '#fff';
+
+// FORMATTER FUNCTIONS
+
+function playerNameFormatter(row, cell, value, columnDef, dataContext)
+{
+	var color;
+
+	if (dataContext.pFaction == 1)
+	{
+		color = vscolor;
+	}
+	else if (dataContext.pFaction == 2)
+	{
+		color = nccolor;
+	}
+	else if (dataContext.pFaction == 3)
+	{
+		color = trcolor;
+	}
+
+	return '<a style="color: '+color+';">'+value+'</a>';
+}
+
+function outfitNameFormatter(row, cell, value, columnDef, dataContext)
+{
+	var color;
+
+	if (dataContext.id == 0) // If No Outfit
+	{
+		return value;
+	}
+	else
+	{
+		if (dataContext.oFaction == 1)
+		{
+			color = vscolor;
+		}
+		else if (dataContext.oFaction == 2)
+		{
+			color = nccolor;
+		}
+		else if (dataContext.oFaction == 3)
+		{
+			color = trcolor;
+		}
+	}
+
+	return '<a style="color: '+color+';">'+value+'</a>';
+}
+
+function weaponNameFormatter(row, cell, value, columnDef, dataContext)
+{
+	var color;
+
+	switch(dataContext.weaponFaction){
+		case 0: color = nscolor; break;
+        case 1: color = vscolor; break;
+        case 2: color = nccolor; break;
+        case 3: color = trcolor; break;
+        default:color = nscolor; break;
+	}
+
+	return '<a style="color: '+color+';">'+value+'</a>';
+}
+
+/* */
+
+var pColumns = [
+	{id: "player", name: "PLAYER", field: "player", minWidth: 240, formatter: playerNameFormatter, sortable: true},
+	{id: "pKills", name: "KIL", field: "pKills", minWidth: 50, sortable: true},
+	{id: "pDeaths", name: "DTH", field: "pDeaths", minWidth: 50, sortable: true},
+	{id: "pKD", name: "K/D", field: "pKD", minWidth: 50, sortable: true},
+	{id: "pTKs", name: "TKs", field: "pTKs", minWidth: 50, sortable: true},
+	{id: "pSuicides", name: "SUI", field: "pSuicides", width: 50, sortable: true},
+];
+
+var oColumns = [
+	{id: "outfit", name: "OUTFIT", field: "outfit", minWidth: 220, formatter: outfitNameFormatter, sortable: true},
+	{id: "oTag", name: "TAG", field: "oTag", minWidth: 50, sortable: true},
+	{id: "oParp", name: "PART", field: "oParp", minWidth: 50, sortable: true},
+	{id: "oKills", name: "KIL", field: "oKills", minWidth: 50, sortable: true},
+	{id: "oDeaths", name: "DTH", field: "oDeaths", minWidth: 50, sortable: true},
+	{id: "oKD", name: "K/D", field: "oKD", minWidth: 50, sortable: true},
+	{id: "oTKs", name: "TKs", field: "oTKs", minWidth: 40, sortable: true},
+	{id: "oSuicides", name: "SUI", field: "oSuicides", minWidth: 40, sortable: true}
+];
+
+var wColumns = [
+	{id: "weapon", name: "Weapon", field: "weapon", minWidth: 120, formatter: weaponNameFormatter, sortable: true},
+	{id: "wepKills", name: "KILLS", field: "wepKills", minWidth: 120, sortable: true}
+];
+
+var vColumns = [
+	{id: "vehicle", name: "VEHICLE", field: "name", minWidth: 100, sortable: true},
+	{id: "vKills", name: "KIL", field: "vKills", minWidth: 60, sortable: true},
+	{id: "vDeaths", name: "DTH", field: "vDeaths", minWidth: 60, sortable: true},
+	{id: "vIKills", name: "I-KIL", field: "vIKills", minWidth: 60, sortable: true},
+	{id: "vIDeaths", name: "I-DTH", field: "vIDeaths", minWidth: 60, sortable: true},
+	{id: "vVKills", name: "V-KIL", field: "vVKills", minWidth: 60, sortable: true},
+	{id: "vVDeaths", name: "V-DTH", field: "vVDeaths", minWidth: 60, sortable: true},
+];
+
+var options = {
+	enableCellNavigation: true,
+	enableColumnReorder: false,
+	forceFitColumns: true, // Needed to fit within the alottted space
+};
+
+/* Initialize the Grid */
+
+/* */
+
+var playerDataView = new Slick.Data.DataView({ inlineFilters: true });
+var outfitDataView = new Slick.Data.DataView({ inlineFilters: true });
+var weaponDataView = new Slick.Data.DataView({ inlineFilters: true });
+var vehicleDataView = new Slick.Data.DataView({ inlineFilters: true });
+var searchStringP = "";
+var searchStringO = "";
+var searchStringW = "";
+var searchStringV = "";
+
+var faction1 = matchInfo.server1Faction;
+var faction2 = matchInfo.server2Faction;
+var faction3 = matchInfo.server3Faction;
+
+var searchTimeout = false;
+
+function animateSearch(hidden)
+{
+	if(searchTimeout){
+		return;
+	}
+
+	var hide = hidden || false; // Default show the thingy if no param is set.
+
+	if(hide){
+		$("#searchButton").removeClass('glyphicon-chevron-right').addClass('glyphicon-search').css(
+		{
+			"border-top-left-radius": "5px",
+		});
+
+		$("#txtSearch").animate(
+		{
+			"width": "0px",
+			"opacity": 0
+		}, 500);
+
+		$("#playerSearch").css("z-index", "-1337");
+
+	} else {
+		$("#searchButton").removeClass('glyphicon-search').addClass('glyphicon-chevron-right').css(
+		{
+			"border-top-left-radius": "0px",
+		});
+
+		$("#txtSearch").animate(
+		{
+			"width": "215px",
+			"opacity": 1
+		}, 500);
+
+		$("#playerSearch").css("z-index", "10000");
+		$("#txtSearch").focus();
+	}
+}
+
+$("#searchButton").click(function(event) {
+	animateSearch($("#searchButton").hasClass('glyphicon-chevron-right'));
+});
+
+var outfitParps = {};
+
+function getServerSmashName(value)
+{
+	var name;
+
+	if (smashchars != null)
+	{
+		if(smashchars.hasOwnProperty(value))
+		{
+			if (smashchars[value]["outfitTag"])
+			{
+				var outfitTag = " ["+smashchars[value]["outfitTag"]+"] ";
+			}
+			else
+			{
+				var outfitTag = " ";
+			}
+
+			name = smashchars[value]["playerName"] +outfitTag+"("+value+")";
+			name = name.replace("ServerSmash", "");
+		}
+		else
+		{
+			name = value;
+		}
+	}
+	else
+	{
+		name = value;
+	}
+
+	return name;
+}
+
+var pRefresh = false;
+var oRefresh = false;
+var wRefresh = false;
+var vRefresh = false;
+
+function refreshStats()
+{
+	if (pRefresh == true)
+	{
+		//console.log("Player Stats Refreshed");
+		pRefresh = false; // Reset flag
+		pGrid.resizeCanvas();
+		pGrid.updateRowCount();
+		pGrid.render();
+	}
+
+	if (oRefresh == true)
+	{
+		//console.log("Outfit Stats Refreshed");
+		oRefresh = false; // Reset flag
+		oGrid.resizeCanvas();
+		oGrid.updateRowCount();
+		oGrid.render();
+	}
+
+	if (wRefresh == true)
+	{
+		//console.log("Weapon Stats Refreshed");
+		wRefresh = false; // Reset flag
+		wGrid.resizeCanvas();
+		wGrid.updateRowCount();
+		wGrid.render();
+	}
+
+	if (vRefresh == true)
+	{
+		//console.log("Vehicle Stats Refreshed");
+		vRefresh = false; // Reset flag
+		vGrid.resizeCanvas();
+		vGrid.updateRowCount();
+		vGrid.render();
+	}
+
+	$("#totalKills").html(killCount);
+	$("#totalDeaths").html(deathCount);
+	$("#totalSuicides").html(suicideCount);
+	$("#totalTKs").html(TKCount);
+
+	$("#vsKills").html(VSKills);
+	$("#ncKills").html(NCKills);
+	$("#trKills").html(TRKills);
+
+	$("#vsDeaths").html(VSDeaths);
+	$("#ncDeaths").html(NCDeaths);
+	$("#trDeaths").html(TRDeaths);
+
+	$("#vsTKs").html(VSTKs);
+	$("#ncTKs").html(NCTKs);
+	$("#trTKs").html(TRTKs);
+
+	$("#vsSuicides").html(VSSuicides);
+	$("#ncSuicides").html(NCSuicides);
+	$("#trSuicides").html(TRSuicides);
+}
+
+// CALCULATE DATA ARRAYS
+
+for (var i = players.length - 1; i >= 0; i--) {
+	var kd;
+
+	if ((parseInt(players[i].playerKills) == 0) && (parseInt(players[i].playerDeaths) == 0)) // If purely suicides... the sad sods.
+	{
+		var kd = 0;
+	}
+	else if (players[i].playerKills == 0)
+	{
+		kd = 0;
+	}
+	else if (players[i].playerDeaths == 0)
+	{
+		kd = parseInt(players[i].playerKills);
+	}
+	else
+	{
+		var numb = (parseInt(players[i].playerKills) / parseInt(players[i].playerDeaths));
+		var kd = +numb.toFixed(2);
+
+		if (kd == "Infinity")
+		{
+			kd = parseInt(players[i].playerKills);
+		}
+	}
+
+	var name = getServerSmashName(players[i].playerName);
+
+	playerDataView.addItem({
+		id: players[i].playerID,
+		player:    name,
+		pKills:    parseInt(players[i].playerKills),
+		pDeaths:   parseInt(players[i].playerDeaths),
+		pTKs:      parseInt(players[i].playerTeamKills),
+		pKD:       kd,
+		pSuicides: parseInt(players[i].playerSuicides),
+		pFaction:  parseInt(players[i].playerFaction)
+	});
+
+	var pOutfit = players[i].playerOutfit;
+
+	if (!outfitParps[pOutfit])
+	{
+		outfitParps[pOutfit] = 1;
+	}
+	else
+	{
+		outfitParps[pOutfit]++;
+	}
+};
+
+for (var i = outfits.length - 1; i >= 0; i--) {
+
+	if ((parseInt(outfits[i].outfitKills) == 0) && (parseInt(outfits[i].outfitDeaths) == 0)) // If purely suicides... the sad sods.
+	{
+		var kd = 0;
+	}
+	else if (parseInt(outfits[i].outfitKills) == 0)
+	{
+		var kd = 0;
+	}
+	else
+	{
+		var numb = (parseInt(outfits[i].outfitKills) / parseInt(outfits[i].outfitDeaths));
+		var kd = +numb.toFixed(2);
+
+		if (kd == "Infinity")
+		{
+			kd = parseInt(outfits[i].outfitKills);
+		}
+	}
+
+	if (outfitParps[outfits[i].outfitID])
+	{
+		var parps = parseInt(outfitParps[outfits[i].outfitID]);
+	}
+	else
+	{
+		var parps = 0;
+	}
+
+	outfitDataView.addItem({
+		id:        outfits[i].outfitID,
+		outfit:    outfits[i].outfitName,
+		oTag:      outfits[i].outfitTag,
+		oParp:     parps,
+		oKills:    parseInt(outfits[i].outfitKills),
+		oDeaths:   parseInt(outfits[i].outfitDeaths),
+		oTKs:      parseInt(outfits[i].outfitTKs),
+		oSuicides: parseInt(outfits[i].outfitSuicides),
+		oKD:       kd,
+		oFaction:  parseInt(outfits[i].outfitFaction)
+	});
+};
+
+for (var i = weapons.length - 1; i >= 0; i--) {
+
+	var weaponName;
+	var weaponFaction;
+	var weaponID = parseInt(weapons[i]["weaponID"]);
+	var valid = 0;
+
+	if ( (weaponID != 0) && (WepData[weaponID]) )
+	{
+		weaponName = WepData[weaponID].weaponName;
+		weaponFaction = WepData[weaponID].weaponFaction;
+		valid = 1;
+	}
+	else if (weaponID != 0)
+	{
+		weaponName = "UNKNOWN WEAPON";
+		weaponFaction = 0;
+		valid = 1;
+	}
+
+	if (valid == 1)
+	{
+		weaponDataView.addItem({
+			id:            parseInt(weapons[i].weaponID),
+			weapon:        weaponName,
+			weaponFaction: parseInt(weaponFaction),
+			wepKills:      parseInt(weapons[i].killCount),
+		});
+	}
+};
+
+for (var i = vehicles.length - 1; i >= 0; i--) {
+
+	var vehicleID = vehicles[i].vehicleID;
+
+	if (vehicles[i].deathCount == 0)
+	{
+		var kd = vehicles[i].killCount;
+	}
+	else
+	{
+		var kd = Math.round((vehicles[i].killCount / vehicles[i].deathCount), 3);
+	}
+
+	var vehiclesLost = parseInt(vehicles[i].deathCount);
+	var nanitesCost = vehNanite[vehicles[i].vehicleID];
+
+	var totalLost = vehiclesLost * nanitesCost;
+
+	totalNanites = totalNanites + totalLost;
+
+	vehicleDataView.addItem({
+		id:       vehicles[i].vehicleID,
+		name:     vehicleNames[vehicleID],
+		vKills:   parseInt(vehicles[i].killCount),
+		vDeaths:  parseInt(vehicles[i].deathCount),
+		vIKills:  parseInt(vehicles[i].killICount),
+		vIDeaths: parseInt(vehicles[i].deathICount),
+		vVKills:  parseInt(vehicles[i].killVCount),
+		vVDeaths: parseInt(vehicles[i].deathVCount),
+	});
+}
+
+/*setTimeout(function() // Remove old data that is no longer used.
+{
+	weapons = [];
+	outfits = [];
+	players = [];
+	vehicles = [];
+}, 10000);*/
+
+// Build teh gridz!
+pGrid = new Slick.Grid("#playerGrid", playerDataView, pColumns, options);
+oGrid = new Slick.Grid("#outfitGrid", outfitDataView, oColumns, options);
+wGrid = new Slick.Grid("#weaponGrid", weaponDataView, wColumns, options);
+vGrid = new Slick.Grid("#vehicleGrid", vehicleDataView, vColumns, options);
+
+function myFilterP(item, args)
+{
+	if (args.searchStringP != "" && item["player"].toUpperCase().indexOf(args.searchStringP.toUpperCase()) === -1)
+	{
+		return false;
+	}
+
+	return true;
+}
+function myFilterO(item, args)
+{
+	if (args.searchStringO != "" && ((item["outfit"].toUpperCase().indexOf(args.searchStringO.toUpperCase()) === -1) && (item["oTag"].toUpperCase().indexOf(args.searchStringO.toUpperCase()) === -1) ))
+	{
+		return false;
+	}
+
+	return true;
+}
+function myFilterW(item, args)
+{
+	if (args.searchStringW != "" && item["weapon"].toUpperCase().indexOf(args.searchStringW.toUpperCase()) === -1)
+	{
+		return false;
+	}
+
+	return true;
+}
+function myFilterV(item, args)
+{
+	if (args.searchStringV != "" && item["name"].toUpperCase().indexOf(args.searchStringV.toUpperCase()) === -1)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+
+// wire up the search textbox to apply the filter to the model
+$("#txtSearch").keyup(function (e)
+{
+	// clear on Esc
+	if (e.which == 27)
+	{
+		this.value = "";
+	}
+
+	searchStringP = this.value;
+	searchStringO = this.value;
+	searchStringW = this.value;
+	searchStringV = this.value;
+
+	var type = $(this).attr("data-search");
+	updateFilter(type);
+});
+
+$("#txtSearch").focusout(function(event) {
+	animateSearch(true);
+
+	searchTimeout = true;
+	setTimeout(function() {
+		searchTimeout = false;
+	}, 250);
+});
+
+var currentGridTab = "players"; // Default tab
+$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+	var tab = e.target.hash.substr(1);
+	if(tab !== undefined){
+		searchStringP = "";
+		searchStringO = "";
+		searchStringW = "";
+		searchStringV = "";
+
+		updateFilter(currentGridTab);
+
+		currentGridTab = tab;
+		updateGridSearchPlaceholder(tab);
+
+		$("#txtSearch").attr("data-search", tab);
+		$("#txtSearch").val("");
+	}
+});
+
+function updateGridSearchPlaceholder(tab){
+	var searchText = "";
+	switch(tab){
+		case 'players': searchText = 'Search for a Player'; break;
+		case 'outfits': searchText = 'Search for an Outfit'; break;
+		case 'weapons': searchText = 'Search for a Weapon'; break;
+		case 'vehicles': searchText = 'Search for a Vehicle'; break;
+	}
+	$("#txtSearch").attr('placeholder', searchText);
+}
+
+function updateFilter(type)
+{
+	switch(type)
+	{
+		case "players":
+		{
+			playerDataView.setFilterArgs(
+			{
+				searchStringP: searchStringP
+			});
+
+			playerDataView.refresh();
+			pRefresh = true;
+			refreshStats();
+			break;
+		}
+		case "outfits":
+		{
+			outfitDataView.setFilterArgs(
+			{
+				searchStringO: searchStringO
+			});
+
+			outfitDataView.refresh();
+			oRefresh = true;
+			refreshStats();
+			break;
+		}
+		case "weapons":
+		{
+			weaponDataView.setFilterArgs(
+			{
+				searchStringW: searchStringW
+			});
+
+			weaponDataView.refresh();
+			wRefresh = true;
+			refreshStats();
+			break;
+		}
+		case "vehicles":
+		{
+			vehicleDataView.setFilterArgs(
+			{
+				searchStringV: searchStringV
+			});
+
+			vehicleDataView.refresh();
+			vRefresh = true;
+			refreshStats();
+			break;
+		}
+	}
+};
+
+// Subscribe to the grid's onSort event.
+// It only gets fired for sortable columns, so make sure your column definition has `sortable = true`.
+pGrid.onSort.subscribe(function(e, args)
+{
+	// args.multiColumnSort indicates whether or not this is a multi-column sort.
+	// If it is, args.sortCols will have an array of {sortCol:..., sortAsc:...} objects.
+	// If not, the sort column and direction will be in args.sortCol & args.sortAsc.
+
+	// We'll use a simple comparer function here.
+	var Pcomparer = function(a, b)
+	{
+		var x = a[args.sortCol.field], y = b[args.sortCol.field];
+
+		if (x < y)
+		return 1;
+
+		if (x > y)
+		return -1;
+
+		// Fields are the same, check player name to sort
+		var aName = a.player.toUpperCase();
+		var bName = b.player.toUpperCase();
+
+		if (aName > bName)
+		return 1;
+		if (aName < bName)
+		return -1;
+		return 0;
+
+		//return (a[args.sortCol.field] > b[args.sortCol.field]) ? 1 : -1;
+	}
+
+	// Delegate the sorting to DataView.
+	// This will fire the change events and update the grid.
+	playerDataView.sort(Pcomparer, args.sortAsc);
+});
+
+  // wire up model events to drive the grid
+playerDataView.onRowCountChanged.subscribe(function (e, args) {
+	pGrid.updateRowCount();
+});
+
+playerDataView.onRowsChanged.subscribe(function (e, args) {
+	pGrid.invalidateRows(args.rows);
+	pGrid.render();
+});
+
+playerDataView.setFilterArgs(
+{
+	searchStringP: searchStringP
+});
+
+playerDataView.setFilter(myFilterP);
+pGrid.setSortColumn("pKills", false); //columnId, ascending
+
+// Subscribe to the grid's onSort event.
+// It only gets fired for sortable columns, so make sure your column definition has `sortable = true`.
+oGrid.onSort.subscribe(function(e, args)
+{
+	// args.multiColumnSort indicates whether or not this is a multi-column sort.
+	// If it is, args.sortCols will have an array of {sortCol:..., sortAsc:...} objects.
+	// If not, the sort column and direction will be in args.sortCol & args.sortAsc.
+
+	// We'll use a simple comparer function here.
+	var Ocomparer = function(a, b)
+	{
+		var x = a[args.sortCol.field], y = b[args.sortCol.field];
+
+		if (x < y)
+		return 1;
+
+		if (x > y)
+		return -1;
+
+		// Fields are the same, check player name to sort
+		var aOName = a.outfit.toUpperCase();
+		var vOName = b.outfit.toUpperCase();
+
+		if (aOName > vOName)
+		return 1;
+		if (aOName < vOName)
+		return -1;
+		return 0;
+
+		//return (a[args.sortCol.field] > b[args.sortCol.field]) ? 1 : -1;
+	}
+
+	// Delegate the sorting to DataView.
+	// This will fire the change events and update the grid.
+	outfitDataView.sort(Ocomparer, args.sortAsc);
+});
+
+  // wire up model events to drive the grid
+outfitDataView.onRowCountChanged.subscribe(function (e, args) {
+	oGrid.updateRowCount();
+});
+
+outfitDataView.onRowsChanged.subscribe(function (e, args) {
+	oGrid.invalidateRows(args.rows);
+	oGrid.render();
+});
+
+outfitDataView.setFilterArgs(
+{
+	searchStringO: searchStringO
+});
+
+outfitDataView.setFilter(myFilterO);
+oGrid.setSortColumn("oKills", false); //columnId, ascending
+
+// Subscribe to the grid's onSort event.
+// It only gets fired for sortable columns, so make sure your column definition has `sortable = true`.
+wGrid.onSort.subscribe(function(e, args)
+{
+	// args.multiColumnSort indicates whether or not this is a multi-column sort.
+	// If it is, args.sortCols will have an array of {sortCol:..., sortAsc:...} objects.
+	// If not, the sort column and direction will be in args.sortCol & args.sortAsc.
+
+	// We'll use a simple comparer function here.
+	var Wcomparer = function(a, b)
+	{
+		var x = a[args.sortCol.field], y = b[args.sortCol.field];
+
+		if (x < y)
+		return 1;
+
+		if (x > y)
+		return -1;
+
+		// Fields are the same, check player name to sort
+		var wName = a.weapon.toUpperCase();
+		var wName2 = b.weapon.toUpperCase();
+
+		if (wName > wName2)
+		return 1;
+		if (wName < wName2)
+		return -1;
+		return 0;
+
+		//return (a[args.sortCol.field] > b[args.sortCol.field]) ? 1 : -1;
+	}
+
+	// Delegate the sorting to DataView.
+	// This will fire the change events and update the grid.
+	weaponDataView.sort(Wcomparer, args.sortAsc);
+});
+
+  // wire up model events to drive the grid
+weaponDataView.onRowCountChanged.subscribe(function (e, args) {
+	wGrid.updateRowCount();
+});
+
+weaponDataView.onRowsChanged.subscribe(function (e, args) {
+	wGrid.invalidateRows(args.rows);
+	wGrid.render();
+});
+
+weaponDataView.setFilterArgs(
+{
+	searchStringW: searchStringW
+});
+
+weaponDataView.setFilter(myFilterW);
+wGrid.setSortColumn("wepKills", false); //columnId, ascending
+
+vGrid.onSort.subscribe(function(e, args)
+{
+	// args.multiColumnSort indicates whether or not this is a multi-column sort.
+	// If it is, args.sortCols will have an array of {sortCol:..., sortAsc:...} objects.
+	// If not, the sort column and direction will be in args.sortCol & args.sortAsc.
+
+	// We'll use a simple comparer function here.
+	var Vcomparer = function(a, b)
+	{
+		var x = a[args.sortCol.field], y = b[args.sortCol.field];
+
+		if (x < y)
+		return 1;
+
+		if (x > y)
+		return -1;
+
+		// Fields are the same, check player name to sort
+		var vName = a.name.toUpperCase();
+		var vName2 = b.name.toUpperCase();
+
+		if (vName > vName2)
+		return 1;
+		if (vName < vName2)
+		return -1;
+		return 0;
+
+		//return (a[args.sortCol.field] > b[args.sortCol.field]) ? 1 : -1;
+	}
+
+	// Delegate the sorting to DataView.
+	// This will fire the change events and update the grid.
+	vehicleDataView.sort(Vcomparer, args.sortAsc);
+});
+
+  // wire up model events to drive the grid
+vehicleDataView.onRowCountChanged.subscribe(function (e, args) {
+	vGrid.updateRowCount();
+});
+
+vehicleDataView.onRowsChanged.subscribe(function (e, args) {
+	vGrid.invalidateRows(args.rows);
+	vGrid.render();
+});
+
+vehicleDataView.setFilterArgs(
+{
+	searchStringV: searchStringV
+});
+
+vehicleDataView.setFilter(myFilterV);
+vGrid.setSortColumn("vKills", false); //columnId, ascending
+
+/* Default Sorting */
+$('#playerGrid .slick-header-columns').children().eq(1).trigger('click');
+$('#outfitGrid .slick-header-columns').children().eq(3).trigger('click');
+$('#weaponGrid .slick-header-columns').children().eq(1).trigger('click');
+$('#vehicleGrid .slick-header-columns').children().eq(1).trigger('click');
+
+function showCapture(message, callback)
+{
+	var facilityName = FacData[message.facilityID].facilityName;
+	var facilityCapturedBy = message.facilityOwner;
+	var facilityCapturedFaction;
+	var verb = "captured";
+
+	if (message.defence == 1)
+	{
+		verb = "defended";
+	}
+
+	if (facilityCapturedBy == 1)
+	{
+		facilityCapturedFaction = "<span style='color: "+vscolor+"'>VS</span>";
+	}
+	else if (facilityCapturedBy == 2)
+	{
+		facilityCapturedFaction = "<span style='color: "+nccolor+"'>NC</span>";
+	}
+	else if (facilityCapturedBy == 3)
+	{
+		facilityCapturedFaction = "<span style='color: "+trcolor+"'>TR</span>";
+	}
+
+	$("#capturedFacility").html(facilityName);
+	$("#capturedFacilityFaction").html(facilityCapturedFaction);
+	$("#capturedFacilityVerb").html(verb);
+
+	$("#barOverlay").css("z-index", 10);
+	$("#barOverlay").animate({opacity: 1}, 500);
+
+	mapStats[message.facilityID]["facilityOwner"] = facilityCapturedBy;
+	refreshMap();
+
+	clearTimeout(showTime); // Clear timeout if there was multiple messages
+
+	var showTime = setTimeout(function()
+	{
+		$("#barOverlay").animate({opacity: 0, "z-index": "-1"}, 500, function()
+		{
+			callback();
+		});
+	}, 4000);
+}
+
+function animateArrows(gainer, looser, callback)
+{
+	console.log("ANIMATING ARROWS");
+	console.log(gainer);
+	console.log(looser);
+
+	var winElem = $("#terr"+gainer);
+	var sectionWin = winElem.attr("data-section");
+
+	var looseElem = $("#terr"+looser);
+	var sectionLooser = looseElem.attr("data-section");
+
+	/*console.log(sectionWin);
+	console.log(sectionLooser);*/
+
+	var winColor = "rgb(14, 190, 14)";
+	var lossColor = "rgb(255, 84, 84)";
+
+	var leftGreen = {"border-right": "10px solid rgb(14, 190, 14)", "border-left": ""};
+	var leftRed = {"border-right": "10px solid rgb(255, 84, 84)", "border-left": ""};
+	var rightGreen = {"border-left": "10px solid rgb(14, 190, 14)", "border-right": ""};
+	var rightRed = {"border-left": "10px solid rgb(255, 84, 84)", "border-right": ""};
+
+	if (sectionWin == 1)
+	{
+		var wGroup = ".arrow-group-l";
+		$(wGroup).detach().prependTo(winElem);
+		$(wGroup+" .arrow").css(rightGreen);
+		$(wGroup).css("right", "40px");
+
+		var leftAnimReturn = {"right": "40px"};
+		var leftAnim = {"opacity": 1, "right": "13px"};
+
+
+		if ((sectionLooser == 2) || (sectionLooser == 3))
+		{
+			var lGroup = ".arrow-group-r";
+			$(".arrow-group-r").detach().prependTo(looseElem);
+			$(".arrow-group-r .arrow").css(rightRed);
+			$(".arrow-group-r").css("left", "3px");
+
+			var rightAnimReturn = {"left": "3px"};
+			var rightAnim = {"opacity": 1, "left": "13px"};
+		}
+	}
+	else if (sectionWin == 2)
+	{
+		if (sectionLooser == 1)
+		{
+			var lGroup = ".arrow-group-l";
+			$(lGroup).detach().prependTo(looseElem);
+			$(lGroup+" .arrow").css(leftRed);
+			$(lGroup).css("right", "13px");
+
+			var rightAnimReturn = {"right": "13px"};
+			var rightAnim = {"opacity": 1, "right": "23px"};
+
+			var wGroup = ".arrow-group-r";
+			$(wGroup).detach().prependTo(winElem);
+			$(wGroup+" .arrow").css(leftGreen);
+			$(wGroup).css("left", "40px");
+
+			var leftAnimReturn = {"left": "40px"};
+			var leftAnim = {"opacity": 1, "left": "3px"};
+		}
+		else if (sectionLooser == 3)
+		{
+			var lGroup = ".arrow-group-r";
+			$(lGroup).detach().prependTo(looseElem);
+			$(lGroup+" .arrow").css(rightRed);
+			$(lGroup).css("left", "3px");
+
+			var rightAnimReturn = {"left": "3px"};
+			var rightAnim = {"opacity": 1, "left": "13px"};
+
+			var wGroup = ".arrow-group-l";
+			$(wGroup).detach().prependTo(winElem);
+			$(wGroup+" .arrow").css(rightGreen);
+			$(wGroup).css("right", "40px");
+
+			var leftAnimReturn = {"right": "40px"};
+			var leftAnim = {"opacity": 1, "right": "13px"};
+		}
+	}
+	else if (sectionWin == 3)
+	{
+		var wGroup = ".arrow-group-r";
+		$(wGroup).detach().prependTo(winElem);
+		$(wGroup+" .arrow").css(leftGreen);
+		$(wGroup).css("left", "40px");
+
+		var leftAnimReturn = {"left": "40px"};
+		var leftAnim = {"opacity": 1, "left": "3px"};
+
+		if ((sectionLooser == 1) || (sectionLooser == 2))
+		{
+			var lGroup = ".arrow-group-l";
+			$(lGroup).detach().prependTo(looseElem);
+			$(lGroup+" .arrow").css(leftRed);
+			$(lGroup).css("right", "13px");
+
+			var rightAnimReturn = {"right": "13px"};
+			var rightAnim = {"opacity": 1, "right": "23px"};
+		}
+	}
+
+	$("#terr"+gainer+" "+wGroup+"").stop(true, false)
+	.animate(leftAnim, 750, "easeOutExpo")
+	.animate({"opacity": 0}, 200).animate(leftAnimReturn, 250)
+	.animate(leftAnim, 750, "easeOutExpo")
+	.animate({"opacity": 0}, 200).animate(leftAnimReturn, 250)
+	.animate(leftAnim, 750, "easeOutExpo")
+	.animate({"opacity": 0}, 200).animate(leftAnimReturn, 250)
+	.animate(leftAnim, 750, "easeOutExpo")
+	.animate({"opacity": 0}, 1000).animate(leftAnimReturn, 250)
+
+	$("#terr"+looser+" "+lGroup+"").stop(true, false)
+	.animate(rightAnim, 750, "easeOutExpo")
+	.animate({"opacity": 0}, 200).animate(rightAnimReturn, 250)
+	.animate(rightAnim, 750, "easeOutExpo")
+	.animate({"opacity": 0}, 200).animate(rightAnimReturn, 250)
+	.animate(rightAnim, 750, "easeOutExpo")
+	.animate({"opacity": 0}, 200).animate(rightAnimReturn, 250)
+	.animate(rightAnim, 750, "easeOutExpo")
+	.animate({"opacity": 0}, 1000).animate(rightAnimReturn, 250, function()
+	{
+		callback();
+	});
+}
+
+/* WEBSOCKET FUNCTIONS */
+
+function onOpenPage() // Once connection is made, send sub message
+{
+	console.log("ON OPEN PAGE");
+	var factionData = $("#factionChart").highcharts();
+
+	{% set neutFaction = match.matchsettings.neutFaction %}
+
+	console.log(inProgress);
+
+	if (inProgress != 0)
+	{
+		{% if not (neutFaction == "vs") %}
+		var vsKillData = factionData.get("vsKillData");
+		{% endif %}
+		{% if not (neutFaction == "nc") %}
+		var ncKillData = factionData.get("ncKillData");
+		{% endif %}
+		{% if not (neutFaction == "tr") %}
+		var trKillData = factionData.get("trKillData");
+		{% endif %}
+
+		if (inProgress == 1)
+		{
+			timer = setInterval(function () {
+				var time = (new Date()).getTime(); // current time
+
+				{% if not (neutFaction == "vs") %}
+				vsKillData.addPoint([time, VSKills], true, false);
+				{% endif %}
+				{% if not (neutFaction == "nc") %}
+				ncKillData.addPoint([time, NCKills], true, false);
+				{% endif %}
+				{% if not (neutFaction == "tr") %}
+				trKillData.addPoint([time, TRKills], true, false);
+				{% endif %}
+			}, 30000);
+
+			refreshTimer = setInterval(function()
+			{
+				refreshStats();
+			}, 500)
+		}
+	}
+
+	if (inProgress != 2)
+	{
+		console.log("SENDING SUBSCRIPTION");
+		websocket.send('{"payload": {"action":"subscribe", "resultID":"'+resultID+'"} }'); // Subscribe to events from this alert only
+	}
+}
+
+var timeattempts = 0;
+
+function sendTime()
+{
+	console.log("Sending Sync Time message");
+
+	var time = new Date().getTime();
+	var timeUTC = Math.floor(time / 1000);
+
+	console.log("SENDING TIME: "+timeUTC);
+
+	// If match hasn't started yet
+	if (inProgress == 0) {
+		var mode = "start";
+	} else {
+		var mode = "end";
+	}
+
+	var message = '{"payload": {"action":"timesync", "resultID":"'+resultID+'", "mode":"'+mode+'", "time": "'+timeUTC+'"} }';
+
+	console.log(message);
+	websocket.send(message);
+}
+
+function onMessagePage(message)
+{
+	// Go through system messages first
+
+	if (message.response == "Subscribed")
+	{
+		console.log("SUBSCRIBED TO WEBSOCKET RESULT: "+resultID);
+
+		sendTime();
+	}
+	else if (message.response == "Unsubscribed")
+	{
+		clearInterval(timer);
+	}
+	else if (message.response == "time")
+	{
+		console.log("Received time sync message");
+		console.log(message);
+
+		var remaining = message.remaining;
+		var timediff = message.timediff;
+		var clientTime = message.clientTime;
+		var calculatedTime = (clientTime + remaining) * 1000;
+
+		console.log(clientTime+" + "+ remaining+" * 1000 = "+calculatedTime);
+
+		if (inProgress != 2)
+		{
+			if (clientTime > calculatedTime)
+			{
+				$(".websocketStatus").removeClass("btn-warning").addClass("btn-danger").html("OVERDUE!");
+			}
+			else
+			{
+				$("#timer").countdown(calculatedTime, function(event)
+				{
+					$(this).text(event.strftime("%H:%M:%S"));
+				});
+
+				$(".websocketStatus").removeClass("btn-warning").addClass("btn-success").html("Time synced!");
+
+				setTimeout(function()
+				{
+					$(".websocketStatus").html("Websocket Connected");
+				}, 5000);
+			}
+		}
+	}
+	else if (message.response == "timeWait") // If server has been freshly restarted
+	{
+		console.log("WAITING");
+
+		if (timeattempts > 5)
+		{
+			console.log("TIME ATTEMPTS BEYOND!");
+			$(".websocketStatus").removeClass("btn-warning").addClass("btn-danger").html("TIME SYNC FAILED!");
+		}
+		else
+		{
+			setTimeout(function()
+			{
+				sendTime();
+			}, 5000);
+		}
+	}
+	else // If neither
+	{
+		if (message.messageType == "alertStart")
+		{
+			alertStarted(message.data);
+
+			console.log(message.data);
+		}
+
+		if (message.messageType == "reload")
+		{
+			location.reload();
+		}
+
+		if (message.messageType == "eventStatus")
+		{
+			if (message.action == "countdown")
+			{
+				alert("Countdown Started!");
+			}
+
+			if (message.action == "matchStart")
+			{
+				alert("Match Started!");
+
+				inProgress = 1;
+				$("#countdownTitle").html("Remaining:");
+			}
+
+			if (message.action == "matchEnd")
+			{
+				alert("Match Ended!");
+				inProgress = 2;
+				$("#countdownTitle").html("Ended!");
+			}
+		}
+
+		if (message.messageType == "alertEnd")
+		{
+			if (message.data.resultID == resultID)
+			{
+				endCurrentAlert(message); // End viewed alert
+			}
+
+			alertEnded(message.data); // Remove from monitor
+
+			console.log(message.data);
+		}
+
+		if (message.messageType == "reset") // If admin has initialted a reset message
+		{
+			if (message.resultID == resultID)
+			{
+				location.reload();
+			}
+		}
+
+		if (message.data.resultID == resultID)
+		{
+			//console.log(message.data);
+
+			var attackerID = String(message.data.attackerID);
+			var victimID = String(message.data.victimID);
+
+			var weaponID = String(message.data.weaponID);
+			var attackerName = String(message.data.attackerName);
+			var victimName = String(message.data.victimName);
+
+			var aFound = false;
+			var vFound = false;
+
+			var aOFound = false;
+			var vOFound = false;
+
+			//console.log(message);
+
+			if (message.messageType == "combat")
+			{
+				var aOutfitID = String(message.data.attackerOutfit);
+				var vOutfitID = String(message.data.victimOutfit);
+				var aOutfitName = String(message.data.aOutfit.name);
+				var vOutfitName = String(message.data.vOutfit.name);
+				var aFaction = String(message.data.attackerFaction);
+				var vFaction = String(message.data.victimFaction);
+				var aOutfitTag = String(message.data.aOutfit.tag);
+				var vOutfitTag = String(message.data.vOutfit.tag);
+				var aOutfitFaction = String(message.data.aOutfit.faction);
+				var vOutfitFaction = String(message.data.vOutfit.faction);
+
+				if (message.data.teamkill == 1)
+				{
+					TKCount++;
+
+					if (message.data.attackerFaction == 1)
+					{
+						VSTKs++;
+					}
+					if (message.data.attackerFaction == 2)
+					{
+						NCTKs++;
+					}
+					if (message.data.attackerFaction == 3)
+					{
+						TRTKs++;
+					}
+				}
+				if (message.data.suicide == 1)
+				{
+					suicideCount++;
+					deathCount++;
+
+					if (message.data.attackerFaction == 1)
+					{
+						VSSuicides++;
+						VSDeaths++;
+					}
+					if (message.data.attackerFaction == 2)
+					{
+						NCSuicides++;
+						NCDeaths++;
+					}
+					if (message.data.attackerFaction == 3)
+					{
+						TRSuicides++;
+						TRDeaths++;
+					}
+				}
+				if ((message.data.suicide == 0) && (message.data.teamkill == 0))
+				{
+					killCount++;
+					deathCount++;
+
+					if (message.data.attackerFaction == 1)
+					{
+						VSKills++;
+					}
+					if (message.data.attackerFaction == 2)
+					{
+						NCKills++;
+					}
+					if (message.data.attackerFaction == 3)
+					{
+						TRKills++;
+					}
+
+					if (message.data.victimFaction == 1)
+					{
+						VSDeaths++;
+					}
+					if (message.data.victimFaction == 2)
+					{
+						NCDeaths++;
+					}
+					if (message.data.victimFaction == 3)
+					{
+						TRDeaths++;
+					}
+				}
+
+				var aPlayer = playerDataView.getItemById(attackerID);
+				var vPlayer = playerDataView.getItemById(victimID);
+
+				var aOutfit = outfitDataView.getItemById(aOutfitID);
+				var vOutfit = outfitDataView.getItemById(vOutfitID);
+
+				if (aPlayer !== undefined)
+				{
+					if (message.data.suicide == 1)
+					{
+						aPlayer.pSuicides++;
+						aPlayer.pDeaths++;
+					}
+
+					if (message.data.teamkill == 1)
+					{
+						aPlayer.pTKs++;
+					}
+
+					if ((message.data.suicide == 0) && (message.data.teamkill == 0))
+					{
+						aPlayer.pKills++;
+					}
+
+					if (aPlayer.pDeaths == 0)
+					{
+						var kd = aPlayer.pKills;
+					}
+					else
+					{
+						var numb = (parseInt(aPlayer.pKills) / parseInt(aPlayer.pDeaths));
+						var kd = +numb.toFixed(2);
+
+						if (kd == "Infinity")
+						{
+							kd = parseInt(aPlayer.pKills);
+						}
+					}
+
+					aPlayer.pKD = kd;
+					aFound = true;
+
+					playerDataView.updateItem(attackerID, aPlayer); // Queues the row to be re-rendered
+					playerDataView.reSort();
+					pRefresh = true;
+				}
+
+				if (attackerID != victimID) // If the same person, don't count them twice.
+				{
+					if (vPlayer !== undefined)
+					{
+						vPlayer.pDeaths++;
+
+						if (vPlayer.pKills == 0)
+						{
+							var kd = 0;
+						}
+						else
+						{
+							var numb = (parseInt(vPlayer.pKills) / parseInt(vPlayer.pDeaths));
+							var kd = +numb.toFixed(2);
+
+							if (kd == "Infinity")
+							{
+								kd = parseInt(vPlayer.pKills);
+							}
+						}
+
+						vPlayer.pKD = kd;
+
+						playerDataView.updateItem(victimID, vPlayer); // Queues the row to be re-rendered
+						playerDataView.reSort();
+						pRefresh = true;
+					}
+				}
+
+				if ((vFound == false) || (attackerID == victimID))
+				{
+					vFound = true;
+				}
+
+				/* OUTFIT PROCESSING */
+
+				if (aOutfit !== undefined)
+				{
+					if (message.data.teamkill == 1)
+					{
+						aOutfit.oTKs++;
+					}
+
+					if (message.data.suicide == 1)
+					{
+						aOutfit.oSuicides++;
+						aOutfit.oDeaths++;
+					}
+
+					if ((message.data.suicide == 0) && (message.data.teamkill == 0))
+					{
+						aOutfit.oKills++;
+					}
+
+					if (aOutfit.oDeaths == 0)
+					{
+						var okd = aOutfit.oKills;
+					}
+					else
+					{
+						var numb = (parseInt(aOutfit.oKills) / parseInt(aOutfit.oDeaths));
+						var okd = +numb.toFixed(2);
+
+						if (okd == "Infinity")
+						{
+							okd = parseInt(aOutfit.oKills);
+						}
+					}
+
+					aOutfit.oKD = okd;
+					aOutfit.oParp = outfitParps[aOutfitID];
+
+					// Queues the row to be re-rendered
+					outfitDataView.updateItem(aOutfitID, aOutfit);
+					outfitDataView.reSort();
+					oRefresh = true;
+
+					aOFound = true;
+				}
+
+				if (vOutfit !== undefined)
+				{
+					if (aOutfit != vOutfit)
+					{
+						vOutfit.oDeaths++;
+
+						if (vOutfit.outfitData == 0)
+						{
+							var okd = 0;
+						}
+						else
+						{
+							var numb = (parseInt(vOutfit.oKills) / parseInt(vOutfit.oDeaths));
+							var okd = +numb.toFixed(2);
+
+							if (okd == "Infinity")
+							{
+							  okd = parseInt(vOutfit.oKills);
+							}
+						}
+
+						vOutfit.oKD = okd;
+						vOutfit.oParp = outfitParps[vOutfitID];
+
+						// Queues the row to be re-rendered
+						outfitDataView.updateItem(vOutfitID, vOutfit);
+						outfitDataView.reSort();
+						oRefresh = true;
+
+						vOFound = true;
+					}
+				}
+
+				/* NEW ITEM PROCESSING */
+
+				var suicide = 0;
+				var kills = 0;
+				var deaths = 0;
+				var tks = 0;
+				var kd = 0;
+
+				if ((aFound == false) || (vFound == false))
+				{
+					pRefresh = true;
+
+					if (aFound == false)
+					{
+						kills = 1;
+						playerName = message.data.attackerName;
+						charID = message.data.victimID;
+
+						if (message.data.teamkill == 1)
+						{
+							kills = 0;
+							deaths = 0;
+							tks = 1;
+						}
+
+						if (message.data.suicide == 1)
+						{
+							suicide = 1;
+							kills = 0;
+							deaths = 1;
+						}
+
+						if (kills == 1)
+						{
+							kd = 1;
+						}
+						else
+						{
+							kd = 0;
+						}
+
+						aFound = true;
+
+						var nameSSA = getServerSmashName(attackerName);
+
+						var topushA = {
+							id: 	   attackerID,
+							player:    nameSSA,
+							pKills:    kills,
+							pDeaths:   deaths,
+							pTKs:      tks,
+							pKD:       kd,
+							pSuicides: suicide,
+							pFaction:  aFaction
+						};
+
+						aFound = true;
+
+						if (!outfitParps[aOutfitID])
+						{
+							outfitParps[aOutfitID] = 1;
+						}
+						else
+						{
+							outfitParps[aOutfitID]++;
+						}
+
+						playerDataView.addItem(topushA);
+					}
+
+					if (vFound == false)
+					{
+						playerName = message.data.victimName;
+						charID = message.data.victimID;
+						vFound = true;
+
+						var nameSSV = getServerSmashName(playerName);
+
+						var topushV = {
+							id: 	   victimID,
+							player:    nameSSV,
+							pKills:    0,
+							pDeaths:   1,
+							pTKs:      0,
+							pKD:       0,
+							pSuicides: 0,
+							pFaction:  vFaction
+						};
+
+						if (!outfitParps[vOutfitID])
+						{
+							outfitParps[vOutfitID] = 1;
+						}
+						else
+						{
+							outfitParps[vOutfitID]++;
+						}
+
+						vFound = true;
+
+						playerDataView.addItem(topushV);
+					}
+				}
+
+				if ((aOFound == false) || (vOFound == false))
+				{
+					if (aOFound == false)
+					{
+						kills = 1;
+						deaths = 0;
+
+						if (message.data.teamkill == 1)
+						{
+							kills = 0;
+							deaths = 0;
+							tks = 1;
+						}
+
+						if (message.data.suicide == 1)
+						{
+							suicide = 1;
+							kills = 0;
+							deaths = 1;
+						}
+
+						var numb = (parseInt(kills) / parseInt(deaths));
+						var okd = +numb.toFixed(2);
+
+						if (okd == "Infinity")
+						{
+							okd = parseInt(kills);
+						}
+
+						var topushAO = {
+							id: 	   aOutfitID,
+							outfit:    aOutfitName,
+							oTag:      aOutfitTag,
+							oParp:     1,
+							oKills:    kills,
+							oDeaths:   deaths,
+							oTKs:      tks,
+							oSuicides: suicide,
+							oKD:       okd,
+							oFaction:  aOutfitFaction
+						};
+
+						outfitDataView.addItem(topushAO);
+						oRefresh = true;
+					}
+
+					if (aOutfitID != vOutfitID) // If the same, don't include it twice
+					{
+						if (vOFound == false)
+						{
+							deaths = 1;
+							outfitName = vOutfitName;
+							outfitID = vOutfitID;
+							outfitTag = vOutfitTag;
+
+							vOFound = true;
+
+							var topushVO = {
+								id: 	   vOutfitID,
+								outfit:    vOutfitName,
+								oTag:      vOutfitTag,
+								oParp:     1,
+								oKills:    0,
+								oDeaths:   1,
+								oTKs:      0,
+								oSuicides: 0,
+								oKD:       0,
+								oFaction:  vOutfitFaction
+							};
+
+							outfitDataView.addItem(topushVO);
+							oRefresh = true;
+						}
+					}
+				}
+
+				/* Participant processing */
+
+				var weaponID = parseInt(message.data.weaponID);
+				var weaponFound = false;
+				wRefresh = false;
+
+				if (weaponID != 0) // If a weapon was present in the message
+				{
+					var weaponRow = weaponDataView.getItemById(weaponID);
+
+					if (weaponRow !== undefined) // If the weapon row exists
+					{
+						weaponRow.wepKills++;
+						weaponDataView.updateItem(weaponID, weaponRow);
+						weaponDataView.reSort();
+
+						weaponFound = true;
+					}
+
+					if (weaponFound != true)
+					{
+						var weaponName;
+						var weaponFaction;
+
+						if (WepData[weaponID])
+						{
+							weaponName = WepData[weaponID].weaponName;
+							weaponFaction = WepData[weaponID].weaponFaction;
+						}
+						else
+						{
+							weaponName = "UNKNOWN WEAPON";
+						}
+
+						var topushW = {
+							id: weaponID,
+							weapon: weaponName,
+							wepKills: 1,
+							weaponFaction: weaponFaction
+						};
+
+						weaponDataView.addItem(topushW);
+						wRefresh = true;
+					}
+				}
+
+				if ((message.data.weaponID == 0) && (message.data.vehicleID != 0))
+				{
+					//alert("RAMMING SPEED WITH: "+VehData[message.vehicleID].vehicleName);
+				}
+				else
+				{
+					//alert("WEAPON: "+WepData[weaponID].weaponName);
+				}
+			}
+
+			else if (message.messageType == "facility") // If a facility update
+			{
+				//console.log(message.data);
+				var totalwidth = $("#territoryBar").width();
+
+				var facilityData = $("#facilityChart").highcharts();
+				var vsSeries = facilityData.get("vsData");
+				var ncSeries = facilityData.get("ncData");
+				var trSeries = facilityData.get("trData");
+				var vsMarkers = facilityData.get("vsMarkers");
+				var ncMarkers = facilityData.get("ncMarkers");
+				var trMarkers = facilityData.get("trMarkers");
+
+				var VS = (totalwidth / 100) * message.data.controlVS;
+				var NC = (totalwidth / 100) * message.data.controlNC;
+				var TR = (totalwidth / 100) * message.data.controlTR;
+
+				var VSPer = message.data.controlVS;
+				var NCPer = message.data.controlNC;
+				var TRPer = message.data.controlTR;
+
+				VSPer = Math.round(VSPer);
+				NCPer = Math.round(NCPer);
+				TRPer = Math.round(TRPer);
+
+				var calculated = VS + NC + TR;
+
+				console.log("TOTAL WIDTH BAR: "+totalwidth);
+				console.log("CALCULATED: "+calculated);
+
+				var diff = 0;
+
+				if (calculated < totalwidth)
+				{
+					diff = totalwidth - calculated;
+					var diff3 = diff / 3;
+					VS = Math.floor(VS + diff3);
+					NC = Math.floor(NC + diff3);
+					TR = Math.floor(TR + diff3);
+				}
+
+				console.log("DIFF: "+diff);
+				console.log("VS: "+VS);
+				console.log("NC: "+NC);
+				console.log("TR: "+TR);
+
+				var total = (VS + NC + TR);
+
+				console.log("TOTAL: "+total);
+				console.log("TOTALWIDTH: "+totalwidth);
+
+				var oldVS = $("#terrvs").attr("data-value");
+				var oldNC = $("#terrnc").attr("data-value");
+				var oldTR = $("#terrtr").attr("data-value");
+
+				var blinkspeed = 500;
+				$("#vsScore").html(VSPer).animate({"opacity": 0}, blinkspeed).animate({"opacity": 1}, blinkspeed).animate({"opacity": 0}, blinkspeed).animate({"opacity": 1}, blinkspeed);
+				$("#ncScore").html(NCPer).animate({"opacity": 0}, blinkspeed).animate({"opacity": 1}, blinkspeed).animate({"opacity": 0}, blinkspeed).animate({"opacity": 1}, blinkspeed);
+				$("#trScore").html(TRPer).animate({"opacity": 0}, blinkspeed).animate({"opacity": 1}, blinkspeed).animate({"opacity": 0}, blinkspeed).animate({"opacity": 1}, blinkspeed);
+
+				showCapture(message.data, function()
+				{
+					var VSColor = vscolor;
+					var NCColor = nccolor;
+					var TRColor = trcolor;
+
+					var VSBarColor = $("#territoryBar").find('.vs').first().css("background-color");
+					var NCBarColor = $("#territoryBar").find('.nc').first().css("background-color");
+					var TRBarColor = $("#territoryBar").find('.tr').first().css("background-color");
+
+					console.log(VSBarColor);
+
+					var looseColor = 'rgb(214, 213, 215)';
+					var winColor = 'rgb(151, 173, 49)';
+
+					var winner;
+					var looser;
+					var nonchange;
+
+					if (VSPer != oldVS)
+					{
+						if (VSPer < oldVS) { VSColor = looseColor; looser = "VS" } else { VSColor = winColor; winner = "VS" }
+					}
+					if (NCPer != oldNC)
+					{
+						if (NCPer < oldNC) { NCColor = looseColor; looser = "NC" } else { NCColor = winColor; winner = "NC" }
+					}
+					if (TRPer != oldTR)
+					{
+						if (TRPer < oldTR) { TRColor = looseColor; looser = "TR" } else { TRColor = winColor; winner = "TR" }
+					}
+
+					$("#terrvs").html(VSPer+"%").attr("data-value", VSPer).css({"background-color": VSColor, "width": VS+"px"}).delay(500).stop(true, false).animate({"background-color": VSBarColor}, 2500);
+
+					$("#terrnc").html(NCPer+"%").attr("data-value", NCPer).css({"background-color": NCColor, "width": NC+"px"}).delay(500).stop(true, false).animate({"background-color": NCBarColor}, 2500);
+
+					$("#terrtr").html(TRPer+"%").attr("data-value", TRPer).css({"background-color": TRColor, "width": TR+"px"}).delay(500).stop(true, false).animate({"background-color": TRBarColor}, 2500);
+
+					$(".tBar").css({ "color": "white"});
+
+					if (message.data.defence == 0)
+					{
+						animateArrows(winner, looser, function()
+						{
+							$(".arrow-group-l").prependTo("#territory_inner_bar");
+							$(".arrow-group-r").prependTo("#territory_inner_bar");
+						});
+					}
+				});
+
+				if (message.data.defence != 1)
+				{
+					var time = (new Date()).getTime(); // current time
+
+					var facID = message.data.facilityID;
+					var facName = FacData[facID]["facilityName"];
+					var facType = FacData[facID]["facilityType"];
+					var newowner = message.data.facilityOwner;
+
+					var link = "http://dev.planetsidebattles.org/assets/img/sprites/"+facType+"-"+newowner+".png";
+
+					{% if not (match.matchsettings.neutFaction == "vs") %}
+						vsSeries.addPoint({x: time, y: VSPer}, true, false);
+						if (newowner == 1)
+						{
+							vsMarkers.addPoint({x: time, title: ' ', text: facName, shape: "url("+link+")"}, true, false);
+						}
+					{% endif %}
+					{% if not (match.matchsettings.neutFaction == "nc") %}
+						ncSeries.addPoint({x: time, y: NCPer}, true, false);
+						if (newowner == 2)
+						{
+							ncMarkers.addPoint({x: time, title: ' ', text: facName, shape: "url("+link+")"}, true, false);
+						}
+					{% endif %}
+					{% if not (match.matchsettings.neutFaction == "tr") %}
+						trSeries.addPoint({x: time, y: TRPer}, true, false);
+						if (newowner == 3)
+						{
+							trMarkers.addPoint({x: time, title: ' ', text: facName, shape: "url("+link+")"}, true, false);
+						}
+					{% endif %}
+				}
+			}
+		}
+
+		else if (message.messageType == "vehicle")
+		{
+			console.log("RECEIVED VEHICLE MESSAGE");
+			console.log(message.data);
+
+			// TO FINISH
+
+			var vehiclesLost = parseInt(vehicles[i].deathCount);
+			var nanitesCost = vehNanite[vehicles[i].vehicleID];
+
+			var totalLost = vehiclesLost * nanitesCost;
+
+			totalNanites = totalNanites + totalLost;
+		}
+	}
+}
+
+var facilityDataVS = [];
+var facilityDataNC = [];
+var facilityDataTR = [];
+
+Highcharts.setOptions({
+	global: {
+		useUTC: true
+	}
+});
+
+$('#factionChart').highcharts('StockChart',
+{
+	chart : {
+		animation: Highcharts.svg, // don't animate in old IE
+		backgroundColor: '',
+		style: {
+			color: 'white'
+		},
+	},
+	credits: {enabled: false},
+	title: {
+		text: ''
+	},
+	xAxis: {
+		type: 'datetime',
+		tickPixelInterval: 75,
+		labels : {
+			style: {
+				color: 'white',
+				fontSize: 12
+			}
+		},
+	},
+	yAxis: {
+		min: 0,
+		labels : {
+			style: {
+				color: 'white',
+				fontSize: 12
+			}
+		},
+		plotLines: [{
+			value: 0,
+			color: '#808080'
+		}]
+	},
+
+	navigator: {
+		enabled: false
+	},
+
+	scrollbar : {
+		enabled : false
+	},
+
+	rangeSelector: {
+		buttonTheme: {
+			fill: 'rgb(123, 123, 123)',
+			style: {
+                color: '#FFF'
+            },
+            states: {
+                hover: {
+                },
+                select: {
+                    fill: 'rgb(48, 48, 48)',
+                    style: {
+                        color: 'white'
+                    }
+                }
+            },
+		},
+		labelStyle: {
+			color: '#FFF',
+		},
+		buttons: [{
+			count: 5,
+			type: 'minute',
+			text: '5M'
+		}, {
+			count: 10,
+			type: 'minute',
+			text: '10M'
+		}, {
+			count: 30,
+			type: 'minute',
+			text: '30M'
+		}, {
+			count: 1,
+			type: 'Hour',
+			text: '1H'
+		}, {
+			type: 'all',
+			text: 'All'
+		}],
+		inputEnabled: false,
+		selected: 4
+	},
+	exporting: {
+		enabled: false
+	},
+	series:
+	[
+		{% if not (match.matchsettings.neutFaction == "vs") %}
+		{
+			name : 'VS Kills',
+			id : 'vsKillData',
+			shadow : false,
+			color: vscolor,
+			marker : {
+				enabled : true,
+				radius : 2,
+				symbol: "circle"
+			},
+			data: (function ()
+			{
+				var data = []
+
+				{% for history in match.statscombathistory %}
+					data.push({
+						x: {{ history.timestamp * 1000 }},
+						y: {{ history.killsVS }}
+					});
+				{% endfor %}
+				return data;
+			}())
+		},
+		{% endif %}
+		{% if not (match.matchsettings.neutFaction == "nc") %}
+		{
+			name : 'NC Kills',
+			id : 'ncKillData',
+			shadow : false,
+			color: nccolor,
+			marker : {
+				enabled : true,
+				radius : 2,
+				symbol: "circle"
+			},
+			data: (function ()
+			{
+				// generate an array of random data
+				var data = []
+
+				{% for history in match.statscombathistory %}
+					data.push({
+						x: {{ history.timestamp * 1000 }},
+						y: {{ history.killsNC }}
+					});
+				{% endfor %}
+				return data;
+			}())
+		},
+		{% endif %}
+		{% if not (match.matchsettings.neutFaction == "tr") %}
+		{
+			name : 'TR Kills',
+			id : 'trKillData',
+			shadow : false,
+			color: trcolor,
+			marker : {
+				enabled : true,
+				radius : 2,
+				symbol: "circle"
+			},
+			data: (function ()
+			{
+				// generate an array of random data
+				var data = []
+
+				{% for history in match.statscombathistory %}
+					data.push({
+						x: {{ history.timestamp * 1000 }},
+						y: {{ history.killsTR }}
+					});
+				{% endfor %}
+				return data;
+			}())
+		},
+		{% endif %}
+	]
+});
+
+// Create the chart
+$('#facilityChart').highcharts('StockChart',
+{
+	chart : {
+		animation: Highcharts.svg, // don't animate in old IE
+		backgroundColor: '',
+		style: {
+			color: 'white'
+		},
+	},
+
+	credits: {enabled: false},
+	title: {
+		text: ''
+	},
+	xAxis: {
+		type: 'datetime',
+		tickPixelInterval: 100,
+		labels : {
+			style: {
+				color: 'white',
+				fontSize: 12
+			}
+		},
+	},
+	yAxis: {
+		minRange: 0,
+		labels : {
+			style: {
+				color: 'white',
+				fontSize: 12
+			}
+		},
+		plotLines: [{
+			value: 0,
+			color: '#808080'
+		}]
+	},
+
+	navigator: {
+		enabled: false
+	},
+
+	scrollbar : {
+		enabled : false
+	},
+
+	rangeSelector: {
+		buttons: [{
+			count: 10,
+			type: 'minute',
+			text: '10M'
+		}, {
+			count: 30,
+			type: 'minute',
+			text: '30M'
+		}, {
+			count: 1,
+			type: 'hour',
+			text: '1H'
+		}, {
+			type: 'all',
+			text: 'All'
+		}],
+		inputEnabled: false,
+		selected: 3
+	},
+
+	exporting: {
+		enabled: false
+	},
+	series :
+	[
+		{% if not (match.matchsettings.neutFaction == "vs") %}
+		{
+			name : 'VS Control %',
+			id : 'vsData',
+			shadow : true,
+			color: vscolor,
+			marker : {
+				enabled : true,
+				radius : 4,
+				symbol: "circle"
+			},
+			data :
+			[ {% for map in match.statsmap %}
+			{% if (map.defence == 0) %}
+				{x: {{map.timestamp * 1000}}, y: {{map.controlVS}}} {%if not loop.last %},{% endif %}
+				{% endif %}
+			{% endfor %}
+			]
+		},
+		{% endif %}
+		{% if not (match.matchsettings.neutFaction == "nc") %}
+		{
+			name : 'NC Control %',
+			id : 'ncData',
+			shadow : true,
+			color: nccolor,
+			marker : {
+				enabled : true,
+				radius : 4,
+				symbol: "circle"
+			},
+			data :
+			[ {% for map in match.statsmap %}
+			{% if (map.defence == 0) %}
+				{x: {{map.timestamp * 1000}}, y: {{map.controlNC}}} {%if not loop.last %},{% endif %}
+				{% endif %}
+			{% endfor %}
+			]
+		},
+		{% endif %}
+		{% if not (match.matchsettings.neutFaction == "tr") %}
+		{
+			name : 'TR Control %',
+			id : 'trData',
+			shadow : true,
+			color: trcolor,
+			marker : {
+				enabled : true,
+				radius : 4,
+				symbol: "circle"
+			},
+			data :
+			[ {% for map in match.statsmap %}
+			{% if (map.defence == 0) %}
+				{x: {{map.timestamp * 1000}}, y: {{map.controlTR}}} {%if not loop.last %},{% endif %}
+				{% endif %}
+			{% endfor %}
+			]
+		},
+		{% endif %}
+
+		{% if not (match.matchsettings.neutFaction == "vs") %}
+		{
+			type: 'flags',
+			id: 'vsMarkers',
+			name: 'VS Markers',
+			data: [ {% for map in match.statsmap %} {% if ((map.defence == 0) and (map.facilityOwner == 1)) %}
+				{x: {{map.timestamp * 1000 }}, title: " ", text: FacData[{{map.facilityID}}]["facilityName"], shape: "url(http://dev.planetsidebattles.org/assets/img/sprites/"+FacData[{{map.facilityID}}]["facilityType"]+"-1.png)"},{% endif %}
+				{% endfor %}
+			],
+			onSeries: 'vsData',
+			color : vscolor,
+			fillColor : 'rgba(163, 0, 255, 0.50)',
+			style : { color : 'white' },
+			states : {
+				hover : {
+					fillColor : '#8C22C3' // darker
+				}
+			},
+			stackDistance: 20,
+			width: 22,
+			y: -22
+		},
+		{% endif %}
+		{% if not (match.matchsettings.neutFaction == "nc") %}
+		{
+			type: 'flags',
+			id: 'ncMarkers',
+			name: 'NC Markers',
+			data: [ {% for map in match.statsmap %} {% if ((map.defence == 0) and (map.facilityOwner == 2)) %}
+				{x: {{map.timestamp * 1000 }}, title: " ", text: FacData[{{map.facilityID}}]["facilityName"], shape: "url(http://dev.planetsidebattles.org/assets/img/sprites/"+FacData[{{map.facilityID}}]["facilityType"]+"-2.png)"},{% endif %}
+				{% endfor %}
+			],
+			onSeries: 'ncData',
+			color : nccolor,
+			fillColor : 'rgba(0, 108, 247, 0.50)',
+			style : { color : 'white' },
+			states : {
+				hover : {
+					fillColor : '#4450D6' // darker
+				}
+			},
+			stackDistance: 20,
+			width: 22,
+			y: -22
+		},
+		{% endif %}
+		{
+			type: 'flags',
+			id: 'trMarkers',
+			name: 'TR Markers',
+			data: [ {% for map in match.statsmap %} {% if ((map.defence == 0) and (map.facilityOwner == 3)) %}
+				{x: {{map.timestamp * 1000 }}, title: " ", text: FacData[{{map.facilityID}}]["facilityName"], shape: "url(http://dev.planetsidebattles.org/assets/img/sprites/"+FacData[{{map.facilityID}}]["facilityType"]+"-3.png)"},
+				{% endif %}
+				{% endfor %}
+			],
+			onSeries: 'trData',
+			color : trcolor,
+			fillColor : 'rgba(255, 0, 0, 0.5)',
+			style : { color : 'white' },
+			states : {
+				hover : {
+					fillColor : '#DB3333' // darker
+				}
+			},
+			stackDistance: 20,
+			width: 22,
+			y: -22
+		}
+	]
+});
+/*console.log("PLAYERS:");
+console.log(statsPlayers);
+
+console.log("OUTFITS:");
+console.log(statsOutfits);
+
+console.log("WEAPONS:");
+console.log(statsWeapons);
+
+console.log("MAP:");
+console.log(statsMap);
+
+console.log("VEHICLES:");
+console.log(statsVehicles);
+
+console.log("FACTION:");
+console.log(statsFactions);
+
+console.log("CHARACTERS:");
+console.log(statsCharacters);*/
+
+
+</script>

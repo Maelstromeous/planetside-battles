@@ -1,0 +1,470 @@
+/* Header */
+
+body
+{
+    background-image: url("../img/backgradv1.jpg");
+}
+
+.navbar-nav li a
+{
+    font-family: "Electrolize", sans-serif;
+    font-weight: bold;
+}
+
+.navbar-nav li:after
+{
+    position: absolute;
+    z-index: 0;
+    top: 10px;
+    /* left: 10px; */
+    right: 0;
+    bottom: 10px;
+
+    display: block;
+
+    width: 1px;
+
+    content: "";
+
+    background-color: rgba(128, 128, 128, .50);
+}
+
+.navbar-nav li:last-child:after
+{
+    width: 0;
+}
+
+.navbar-brand
+{
+    height: 50px !important;
+    padding: 8px !important;
+}
+
+.social_icon img
+{
+    height: 26px;
+}
+
+.social_icon a
+{
+    height: 50px;
+    padding: 12px !important;
+}
+
+#psblogo img
+{
+    width: 100%;
+    height: 100%;
+}
+
+/* ==== */
+
+#content
+{
+    padding-top: 10px;
+}
+
+/* Common Classes */
+
+.automargin
+{
+    margin-left: auto;
+
+    -margin-right: auto;
+}
+
+.carousel-inner .item img
+{
+    margin-right: auto;
+    margin-left: auto;
+}
+
+#carousel-header
+{
+    box-shadow: 0 0 50px black;
+}
+
+h1, h2, h3, h4
+{
+    font-family: "Electrolize", sans-serif !important;
+}
+
+p, ul, li
+{
+    font-family: "Noto Sans", sans-serif;
+
+    color: rgb(205, 205, 205);
+}
+
+.dropdown-header
+{
+    font-size: 16px;
+}
+
+.content
+{
+    margin-top: 40px;
+}
+
+.content_inner
+{
+    position: relative;
+
+    margin: 20px;
+    margin-top: 0;
+    margin-bottom: 5px;
+    padding: 20px;
+    padding-top: 30px;
+
+    border-top: 1px solid rgb(53, 53, 53);
+    border-radius: 10px;
+    border-radius: 0;
+    background-color: rgb(40, 40, 40);
+    box-shadow: 2px 2px 5px rgb(0, 0, 0);
+}
+
+.content_section
+{
+    position: relative;
+
+    margin: 20px;
+    padding: 20px;
+
+    border-top: 1px solid rgb(53, 53, 53);
+    border-radius: 10px;
+    border-radius: 0;
+    background-color: rgb(40, 40, 40);
+    box-shadow: 2px 2px 5px rgb(0, 0, 0);
+}
+
+.content_spacer
+{
+    width: 100%;
+    height: 10px;
+}
+
+.folded
+{
+    position: relative;
+
+    margin-top: -51px;
+    margin-bottom: 10px;
+    margin-left: -40px;
+}
+
+.folded h2
+{
+    font-size: 28px;
+    font-weight: bold;
+
+    left: -20px;
+
+    display: inline-block;
+
+    margin: 0;
+    padding: 5px 30px;
+
+    color: #fff;
+    border: 0 solid rgba(0,0,0,.2);
+    background: #db7807;
+    text-shadow: 3px 2px 1px rgba(0,0,0,.4);
+}
+
+.folded:before
+{
+    position: absolute;
+    bottom: -20px;
+    left: 0;
+
+    content: "";
+
+    border-width: 10px;
+    border-style: solid;
+    border-color: #995404 #995404 transparent transparent;
+}
+
+hr
+{
+    border-top: 1px solid #814500 !important;
+}
+
+table h5
+{
+    text-align: center;
+}
+
+.table td
+{
+    color: white !important;
+}
+
+.table th
+{
+    font-family: "Electrolize", sans-serif !important;
+    font-size: 18px;
+    border-top: 0 !important;
+    color: white !important;
+}
+
+/* Image Hack */
+
+.home_container
+{
+    margin-top: 10px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+.home_col
+{
+    border-right: 1px solid #814500;
+}
+
+@media (max-width: 992px)
+{
+    .home_col
+    {
+        border-right: 0;
+    }
+
+    .home_top_row
+    {
+        margin-bottom: 10px;
+        padding-bottom: 10px;
+
+        border-bottom: 1px solid #814500;
+    }
+}
+
+.home_col img
+{
+    width: 100%;
+    height: auto;
+}
+
+.home_col div
+{
+    color: white;
+    border-radius: 2px;
+    background-color: #333;
+    box-shadow: 2px 2px 10px black;
+}
+
+.noshadow, .noshadow div
+{
+    box-shadow: none !important;
+}
+
+.noback, .noback div
+{
+    background: none;
+}
+
+.placeholder
+{
+    height: 200px;
+}
+
+.youtube
+{
+    height: 300px;
+}
+
+.home_container .row .home_col:last-child
+{
+    border: 0;
+}
+
+.home_spacer
+{
+    width: 100%;
+    height: 1px;
+    margin-top: 0;
+    margin-bottom: 10px;
+
+    background-color: #814500 !important;
+}
+
+a.tweet-box-button
+{
+    background-color: #383838 !important;
+}
+
+.rembeddit
+{
+    border: 0 !important;
+}
+
+.rembeddit img, .rembeddit div
+{
+    width: auto;
+    height: auto;
+
+    box-shadow: none !important;
+}
+
+.reddit-link-title
+{
+    color: #c57e0f !important;
+}
+
+.reddit-link
+{
+    border-bottom: 1px solid #696969 !important;
+}
+
+.reddit-link:last-child
+{
+    border-bottom: 0 !important;
+}
+
+.jumbo
+{
+    font-family: "Electrolize" sans-serif;
+    font-size: 50px;
+
+    color: white;
+}
+
+.videoWrapper
+{
+    position: relative;
+
+    height: 0;
+    padding-top: 25px;
+    padding-bottom: 56.25%; /* 16:9 */
+}
+
+.videoWrapper iframe
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 100%;
+}
+
+.editor_body
+{
+    padding: 10px;
+
+    background-color: rgb(40, 40, 40);
+    background-image: none !important;
+}
+
+.table-striped > tbody > tr:nth-child(odd)
+{
+  background-color: #373737;
+}
+
+/* TOURNAMENT 2015 CSS */
+
+.tournamentFlag {
+    padding:0 !important;
+}
+
+.tournamentInfo {
+    margin-top: 10px;
+}
+
+.tournamentLinks {
+    margin-top: 27px;
+}
+
+.tournamentServer * , .tournamentScores * {
+    line-height: 81px;
+    margin: 0;
+    text-align: center;
+}
+
+.tournamentScores {
+    line-height: 95px;
+}
+
+.tab-content .tab-pane {
+    margin-top: 20px;
+}
+
+.border-right { border-right: 1px solid rgb(129, 69, 0);}
+.border-bottom { border-bottom: 1px solid rgb(129, 69, 0);}
+.border-left { border-left: 1px solid rgb(129, 69, 0);}
+.border-top {border-top: 1px solid rgb(129, 69, 0);}
+
+.nav-tabs li.active a, .nav-tabs li.active a:focus
+{
+    background-color: #A3742A;
+    color: white;
+}
+
+@media (max-width: 1200px ) {
+    .tournamentInfo {
+        margin-top: 0;
+    }
+
+    .tournamentFlag {
+        margin-top: 10px;
+    }
+}
+
+@media (max-width: 992px) {
+    .tournamentInfo {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 768px ) {
+    .border-right { border-right: 0;}
+    .border-bottom { border-bottom: 0;}
+    .border-left { border-left: 0;}
+    .border-top { border-top: 0;}
+
+    .tournamentLinks {
+        border: 0;
+    }
+
+}
+
+@media (max-width: 570px) {
+    .tournamentServer * , .tournamentScores * {
+        line-height: 45px;
+        margin: 0;
+        text-align: center;
+        font-size: 22px;
+        padding: 0;
+    }
+
+    .tournamentRow * {
+        padding: 0;
+    }
+
+    .tournamentLinks a {
+        padding: 5px;
+    }
+
+    .tournamentRow {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+}
+
+.vs { background-color: #7F31AD; }
+.vsText { color: #9935F5; }
+.nc { background-color: #2A59D5; }
+.ncText { color: #1685F2; }
+.tr { background-color: #B40000; }
+.trText { color: #B40000; }
+
+.btn-success {
+    background-color: #158015;
+}
+
+.btn-default {
+    color: #FFF;
+    background-color: #676767;
+    border-color: #9C9898;
+}
+
+.btn-danger {
+    background-color: #BD1510;
+}

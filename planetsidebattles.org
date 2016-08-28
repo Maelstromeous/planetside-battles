@@ -1,0 +1,139 @@
+server
+{
+	server_name 	www.planetsidebattles.org;
+	return		301 http://planetsidebattles.org$request_uri;
+}
+
+server 
+{
+	server_name direct.planetsidebattles.org planetsidebattles.org;
+	root /var/www/planetsidebattles.org/html/web;
+
+	location / 
+	{
+		# try to serve file directly, fallback to app.php
+		try_files $uri /app.php$is_args$args;
+	}
+
+	# PROD
+	location ~ ^/(app|pull)\.php(/|$) {
+		fastcgi_pass unix:/var/run/php5-fpm.sock;
+		fastcgi_split_path_info ^(.+\.php)(/.*)$;
+
+		fastcgi_param	SCRIPT_FILENAME	$document_root$fastcgi_script_name;
+		fastcgi_param	SCRIPT_NAME	$fastcgi_script_name;
+		fastcgi_param	HTTPS off;
+
+		fastcgi_buffer_size 128k;
+		fastcgi_buffers 256 16k;
+		fastcgi_busy_buffers_size 256k;
+		fastcgi_temp_file_write_size 256k;
+
+		include fastcgi_params;
+	}
+}
+
+server 
+{
+	server_name dev.planetsidebattles.org;
+	root /var/www/planetsidebattles.org/dev/web;
+
+	location / 
+	{
+		# try to serve file directly, fallback to app.php
+		try_files $uri /app_dev.php$is_args$args;
+	}
+
+	# DEV
+	# This rule should only be placed on your development environment
+	# In production, don't include this and don't deploy app_dev.php or config.php
+
+	location ~ ^/(app_dev|pull_dev|config)\.php(/|$)
+	{
+		fastcgi_pass unix:/var/run/php5-fpm.sock;
+		fastcgi_split_path_info ^(.+\.php)(/.*)$;
+
+		fastcgi_param	SCRIPT_FILENAME	$document_root$fastcgi_script_name;
+		fastcgi_param	SCRIPT_NAME	$fastcgi_script_name;
+		fastcgi_param	HTTPS off;
+
+		fastcgi_buffer_size 128k;
+		fastcgi_buffers 256 16k;
+		fastcgi_busy_buffers_size 256k;
+		fastcgi_temp_file_write_size 256k;
+
+		include fastcgi_params;
+	}
+}
+
+server 
+{
+	server_name staging.planetsidebattles.org;
+	root /var/www/planetsidebattles.org/staging/web;
+
+	location / 
+	{
+		# try to serve file directly, fallback to app.php
+		try_files $uri /app.php$is_args$args;
+	}
+
+	# Staging
+	location ~ ^/(app|pull_staging)\.php(/|$)
+	{
+		fastcgi_pass unix:/var/run/php5-fpm.sock;
+		fastcgi_split_path_info ^(.+\.php)(/.*)$;
+
+		fastcgi_param	SCRIPT_FILENAME	$document_root$fastcgi_script_name;
+		fastcgi_param	SCRIPT_NAME	$fastcgi_script_name;
+		fastcgi_param	HTTPS off;
+
+		fastcgi_buffer_size 128k;
+		fastcgi_buffers 256 16k;
+		fastcgi_busy_buffers_size 256k;
+		fastcgi_temp_file_write_size 256k;
+
+		include fastcgi_params;
+	}
+}
+
+server 
+{
+	server_name forums.planetsidebattles.org;
+
+	root /var/www/planetsidebattles.org/forum;
+
+	location / {
+		# phpbb uses index.htm
+		index index.php index.html index.htm;
+	}
+
+	# Deny access to internal phpbb files.
+	location ~ /(config\.php|common\.php|includes|cache|files|store|images/avatars/upload) {
+		deny all;
+		# deny was ignored before 0.8.40 for connections over IPv6.
+		# Use internal directive to prohibit access on older versions.
+		internal;
+	}
+
+	# Pass the php scripts to fastcgi server specified in upstream declaration.
+	location ~ \.php$ {
+	fastcgi_pass unix:/var/run/php5-fpm.sock;
+		fastcgi_split_path_info ^(.+\.php)(/.*)$;
+		include fastcgi_params;
+		fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+		fastcgi_param HTTPS off;	
+	}
+
+	# Deny access to version control system directories.
+	location ~ /\.svn|/\.git {
+		deny all;
+		internal;
+	}
+}
+
+
+
+# If running php as fastcgi, specify php upstream.
+upstream php {
+	server unix:/tmp/php.sock;
+}
