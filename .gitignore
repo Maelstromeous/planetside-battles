@@ -9,3 +9,6 @@ psbsite
 web/assets/bootstrap/node_modules/
 *.tmp
 ftpsync.settings
+vendor/
+web/bundles/framework
+web/bundles/
