@@ -1,6 +1,6 @@
-*.cache
+app/cache/*
+!app/cache/.gitkeep
 *.log
-app/cache
 !Designs/
 *.php~
 *.psd
