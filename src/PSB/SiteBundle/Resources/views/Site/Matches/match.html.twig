@@ -501,13 +501,13 @@ var inProgress = {{match.status}};
 
 {% if match.id >= 32 %}
 <script src="{{ asset('assets/js/leaflet-src.js') }}"></script>
-<script src="{{ asset('assets/js/map_data_indar.js') }}"></script>
-<script src="{{ asset('assets/js/map_data_hossin.js') }}"></script>
-<script src="{{ asset('assets/js/map_data_amerish.js') }}"></script>
-<script src="{{ asset('assets/js/map_data_esamir.js') }}"></script>
+<script src="{{ asset('assets/js/map/map_data_indar.js') }}"></script>
+<script src="{{ asset('assets/js/map/map_data_hossin.js') }}"></script>
+<script src="{{ asset('assets/js/map/map_data_amerish.js') }}"></script>
+<script src="{{ asset('assets/js/map/map_data_esamir.js') }}"></script>
 
-<script src="http://dev.braham.eu/ps2live/map/map_state_indar.js"></script>
-<script src="http://dev.braham.eu/ps2live/map/map_engine.js"></script>
+<script src="/assets/js/map/map_state_indar.js"></script>
+<script src="/assets/js/map/map_engine.js"></script>
 {% endif %}
 
 {% include 'PSBSiteBundle::Site/Matches/matches-jquery.html.twig' with {'match': match} %}
