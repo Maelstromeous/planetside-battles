@@ -1991,7 +1991,7 @@ function onMessagePage(message)
 					var facType = FacData[facID]["facilityType"];
 					var newowner = message.data.facilityOwner;
 
-					var link = "http://dev.planetsidebattles.org/assets/img/sprites/"+facType+"-"+newowner+".png";
+					var link = "/assets/img/sprites/"+facType+"-"+newowner+".png";
 
 					{% if not (match.matchsettings.neutFaction == "vs") %}
 						vsSeries.addPoint({x: time, y: VSPer}, true, false);
@@ -2358,7 +2358,7 @@ $('#facilityChart').highcharts('StockChart',
 			id: 'vsMarkers',
 			name: 'VS Markers',
 			data: [ {% for map in match.statsmap %} {% if ((map.defence == 0) and (map.facilityOwner == 1)) %}
-				{x: {{map.timestamp * 1000 }}, title: " ", text: FacData[{{map.facilityID}}]["facilityName"], shape: "url(http://dev.planetsidebattles.org/assets/img/sprites/"+FacData[{{map.facilityID}}]["facilityType"]+"-1.png)"},{% endif %}
+				{x: {{map.timestamp * 1000 }}, title: " ", text: FacData[{{map.facilityID}}]["facilityName"], shape: "url(/assets/img/sprites/"+FacData[{{map.facilityID}}]["facilityType"]+"-1.png)"},{% endif %}
 				{% endfor %}
 			],
 			onSeries: 'vsData',
@@ -2381,7 +2381,7 @@ $('#facilityChart').highcharts('StockChart',
 			id: 'ncMarkers',
 			name: 'NC Markers',
 			data: [ {% for map in match.statsmap %} {% if ((map.defence == 0) and (map.facilityOwner == 2)) %}
-				{x: {{map.timestamp * 1000 }}, title: " ", text: FacData[{{map.facilityID}}]["facilityName"], shape: "url(http://dev.planetsidebattles.org/assets/img/sprites/"+FacData[{{map.facilityID}}]["facilityType"]+"-2.png)"},{% endif %}
+				{x: {{map.timestamp * 1000 }}, title: " ", text: FacData[{{map.facilityID}}]["facilityName"], shape: "url(/assets/img/sprites/"+FacData[{{map.facilityID}}]["facilityType"]+"-2.png)"},{% endif %}
 				{% endfor %}
 			],
 			onSeries: 'ncData',
@@ -2403,7 +2403,7 @@ $('#facilityChart').highcharts('StockChart',
 			id: 'trMarkers',
 			name: 'TR Markers',
 			data: [ {% for map in match.statsmap %} {% if ((map.defence == 0) and (map.facilityOwner == 3)) %}
-				{x: {{map.timestamp * 1000 }}, title: " ", text: FacData[{{map.facilityID}}]["facilityName"], shape: "url(http://dev.planetsidebattles.org/assets/img/sprites/"+FacData[{{map.facilityID}}]["facilityType"]+"-3.png)"},
+				{x: {{map.timestamp * 1000 }}, title: " ", text: FacData[{{map.facilityID}}]["facilityName"], shape: "url(/assets/img/sprites/"+FacData[{{map.facilityID}}]["facilityType"]+"-3.png)"},
 				{% endif %}
 				{% endfor %}
 			],
