@@ -62,9 +62,9 @@ doctrine:
                 driver:   %database_driver%
                 host:     %database_host%
                 port:     %database_port%
-                dbname:   ps2alerts_data
-                user:     ps2alerts
-                password: PS2ALERTSISTHEMOSTAMAZINGTHINGEVER
+                dbname:   %database_data_name%
+                user:     %database_data_user%
+                password: %database_data_password%
                 charset:  UTF8
     orm:
         auto_generate_proxy_classes: "%kernel.debug%"

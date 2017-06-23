@@ -60,7 +60,6 @@ class MatchController extends Controller
         $supplimental["VehicleData"] = $serializer->serialize($this->getSupplimentalData("vehicle_data"), 'json');
         // Grab sup data. Pass it the serializer so we don't have to initiate again.
 
-        $supplimentalData = unserialize($supplimental);
         $match->supplimental = $supplimental; // Assign the supplimental stats to a key
 
         $metrics["matchInfo"] = $serializer->serialize($match->getServersmashdata(), 'json');

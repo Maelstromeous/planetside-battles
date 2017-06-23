@@ -14,6 +14,8 @@ $loader = require_once __DIR__.'/../app/bootstrap.php.cache';
 $loader->unregister();
 $apcLoader->register(true);*/
 
+date_default_timezone_set("UTC");
+
 require_once __DIR__.'/../app/AppKernel.php';
 require_once __DIR__.'/../app/AppCache.php';
 
